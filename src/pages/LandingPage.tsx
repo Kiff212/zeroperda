@@ -63,33 +63,137 @@ export function LandingPage() {
                 <span className="animate-pulse ml-2">⚠️</span>
             </div>
 
-            {/* HERO SECTION */}
-            <header ref={heroRef} className="relative min-h-[90vh] flex flex-col items-center justify-center p-6 text-center border-b border-zinc-900 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-zinc-900 via-black to-black">
+            {/* HERO SECTION - NANO BANANA STYLE */}
+            <header ref={heroRef} className="relative min-h-[90vh] flex flex-col md:flex-row items-center justify-between p-6 md:p-12 border-b border-zinc-900 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-zinc-900 via-black to-black overflow-hidden">
                 <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 pointer-events-none"></div>
 
-                <h1 className="hero-text text-5xl md:text-7xl font-black uppercase tracking-tighter mb-6 leading-[0.9] max-w-5xl">
-                    Sua margem de lucro<br />
-                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-industrial-red to-red-600">não deveria ter data de validade.</span>
-                </h1>
+                {/* TEXT CONTENT (Left) */}
+                <div className="relative z-10 max-w-2xl text-center md:text-left pt-12 md:pt-0">
+                    <h1 className="hero-text text-5xl md:text-7xl font-black uppercase tracking-tighter mb-6 leading-[0.9]">
+                        Sua margem de lucro<br />
+                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-industrial-red to-red-600">não deveria ter data de validade.</span>
+                    </h1>
 
-                <p className="hero-text text-zinc-400 text-lg md:text-xl max-w-3xl font-medium leading-relaxed mb-10">
-                    O sistema de inteligência que transforma perdas invisíveis em caixa recuperado. Deixe de reagir aos vencimentos e comece a antecipar o lucro.
-                </p>
+                    <p className="hero-text text-zinc-400 text-lg md:text-xl font-medium leading-relaxed mb-10 max-w-xl mx-auto md:mx-0">
+                        O sistema de inteligência que transforma perdas invisíveis em caixa recuperado. Deixe de reagir aos vencimentos e comece a antecipar o lucro.
+                    </p>
 
-                <div className="hero-text flex flex-col md:flex-row gap-4 w-full max-w-md">
-                    <button
-                        onClick={() => navigate('/intro')}
-                        className="flex-1 bg-industrial-red text-white p-5 rounded-lg border-2 border-industrial-red font-black uppercase tracking-wider hover:bg-red-600 hover:scale-105 active:scale-95 transition-all shadow-[0_0_30px_rgba(239,68,68,0.3)] flex items-center justify-center gap-2 btn-glow"
-                    >
-                        Estancar perdas agora
-                        <ArrowRight size={20} strokeWidth={3} />
-                    </button>
-                    <button
-                        onClick={() => navigate('/login')}
-                        className="flex-1 bg-transparent text-zinc-400 p-5 rounded-lg border-2 border-zinc-800 font-bold uppercase tracking-wider hover:text-white hover:border-white transition-all"
-                    >
-                        Já tenho acesso
-                    </button>
+                    <div className="hero-text flex flex-col w-full max-w-md mx-auto md:mx-0">
+                        <div className="flex gap-4 mb-3">
+                            <button
+                                onClick={() => navigate('/intro')}
+                                className="flex-1 bg-industrial-red text-white p-5 rounded-lg border-2 border-industrial-red font-black uppercase tracking-wider hover:bg-red-500 hover:border-red-400 active:scale-95 transition-all shadow-[0_0_40px_rgba(239,68,68,0.4)] hover:shadow-[0_0_60px_rgba(239,68,68,0.6)] flex items-center justify-center gap-2 btn-glow group overflow-hidden relative"
+                            >
+                                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent translate-x-[-100%] group-hover:animate-[shimmer_1s_infinite]"></div>
+                                Estancar perdas agora
+                                <ArrowRight size={20} strokeWidth={3} className="text-white group-hover:translate-x-1 transition-transform" />
+                            </button>
+                            <button
+                                onClick={() => navigate('/login')}
+                                className="flex-1 bg-transparent text-zinc-400 p-5 rounded-lg border-2 border-zinc-800 font-bold uppercase tracking-wider hover:text-white hover:border-white transition-all"
+                            >
+                                Já tenho acesso
+                            </button>
+                        </div>
+                        <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-wide text-center md:text-left pl-1">
+                            🚀 Instalação em 2 minutos. <span className="text-zinc-600">Sem cartão de crédito.</span>
+                        </p>
+                    </div>
+                </div>
+
+                {/* PRODUCT VISUAL (Right / Mockup) */}
+                <div className="relative z-10 w-full max-w-2xl mt-16 md:mt-0 perspective-1000 hidden md:block">
+                    {/* Floating Glow Behind */}
+                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] bg-industrial-red/20 blur-[100px] rounded-full opacity-50 pointer-events-none"></div>
+
+                    {/* Glassmorphism Dashboard Container */}
+                    <div className="
+                        relative bg-zinc-900/60 backdrop-blur-xl border border-white/10 rounded-xl shadow-2xl overflow-hidden
+                        transform rotate-y-[-5deg] rotate-x-[5deg] hover:rotate-y-0 hover:rotate-x-0 transition-transform duration-700 ease-out
+                    ">
+                        {/* Header Bar */}
+                        <div className="flex items-center justify-between p-4 border-b border-white/5 bg-white/5">
+                            <div className="flex gap-2">
+                                <div className="w-3 h-3 rounded-full bg-red-500/50"></div>
+                                <div className="w-3 h-3 rounded-full bg-yellow-500/50"></div>
+                                <div className="w-3 h-3 rounded-full bg-green-500/50"></div>
+                            </div>
+                            <div className="h-2 w-20 bg-white/10 rounded-full"></div>
+                        </div>
+
+                        {/* Fake Dashboard Content */}
+                        <div className="p-6 grid grid-cols-3 gap-4">
+                            {/* Left Col */}
+                            <div className="col-span-1 space-y-3">
+                                <div className="h-20 bg-white/5 rounded-lg animate-pulse"></div>
+                                <div className="h-8 bg-white/5 rounded-lg w-3/4"></div>
+                                <div className="h-8 bg-white/5 rounded-lg w-1/2"></div>
+                            </div>
+                            {/* Right Col */}
+                            <div className="col-span-2 space-y-4">
+                                <div className="h-32 bg-gradient-to-br from-industrial-red/20 to-transparent rounded-lg border border-industrial-red/20 relative overflow-hidden">
+                                    {/* Graph Line */}
+                                    <svg className="absolute bottom-0 left-0 w-full h-[60%] text-industrial-red" viewBox="0 0 100 40" preserveAspectRatio="none">
+                                        <path d="M0 40 L10 35 L20 38 L30 25 L40 30 L50 20 L60 25 L70 15 L80 18 L90 10 L100 15 V40 H0 Z" fill="currentColor" opacity="0.5" />
+                                        <path d="M0 40 L10 35 L20 38 L30 25 L40 30 L50 20 L60 25 L70 15 L80 18 L90 10 L100 15" stroke="currentColor" strokeWidth="2" fill="none" />
+                                    </svg>
+                                </div>
+                                <div className="flex gap-2">
+                                    <div className="flex-1 h-12 bg-white/5 rounded-lg"></div>
+                                    <div className="flex-1 h-12 bg-white/5 rounded-lg"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* FLOATING NOTIFICATION (The "Product Hero" Detail) */}
+                        <div className="absolute top-1/2 -right-8 md:-right-12 translate-y-[-20%] bg-zinc-950 border border-zinc-800 p-4 rounded-lg shadow-2xl max-w-[280px] animate-bounce-slow z-30">
+                            <div className="flex items-start gap-4">
+                                <div className="bg-industrial-red/20 p-2 rounded-lg text-industrial-red">
+                                    <AlertTriangle size={20} />
+                                </div>
+                                <div>
+                                    <h4 className="text-white font-bold text-sm mb-1 line-clamp-1">Iogurte Batavo Morango</h4>
+                                    <p className="text-zinc-400 text-xs mb-2">Vence em <span className="text-industrial-red font-bold">3 dias</span></p>
+                                    <button className="text-[10px] bg-industrial-red text-white py-1 px-2 rounded uppercase font-bold tracking-wider w-full hover:bg-red-600 transition-colors">
+                                        Aplicar 30% OFF
+                                    </button>
+                                </div>
+                            </div>
+                            {/* Badge */}
+                            <div className="absolute -top-2 -left-2 bg-green-500 text-black text-[9px] font-black px-1.5 rounded-full uppercase">
+                                Ação Necessária
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                {/* TICKER (Footer of Hero) */}
+                <div className="absolute bottom-0 left-0 w-full border-t border-zinc-900 bg-black/50 backdrop-blur-sm overflow-hidden py-3">
+                    <div className="flex whitespace-nowrap animate-marquee">
+                        {[1, 2, 3].map((i) => (
+                            <div key={i} className="flex items-center gap-12 px-6">
+                                <span className="flex items-center gap-2 text-xs font-bold font-mono text-zinc-400 uppercase">
+                                    <span className="text-lg">🥛</span> Leite Integral: <span className="text-green-500">SALVO</span>
+                                </span>
+                                <span className="flex items-center gap-2 text-xs font-bold font-mono text-zinc-400 uppercase">
+                                    <span className="text-lg">🥩</span> Picanha: <span className="text-yellow-500 animate-pulse">ATENÇÃO</span>
+                                </span>
+                                <span className="flex items-center gap-2 text-xs font-bold font-mono text-zinc-400 uppercase">
+                                    <span className="text-lg">🍞</span> Pão de Forma: <span className="text-industrial-red animate-pulse">CRÍTICO</span>
+                                </span>
+                                <span className="flex items-center gap-2 text-xs font-bold font-mono text-zinc-400 uppercase">
+                                    <span className="text-lg">🥫</span> Molho Tomate: <span className="text-blue-500">MONITORADO</span>
+                                </span>
+                                <span className="flex items-center gap-2 text-xs font-bold font-mono text-zinc-400 uppercase">
+                                    <span className="text-lg">🥬</span> Alface: <span className="text-green-500">SALVO</span>
+                                </span>
+                                <span className="flex items-center gap-2 text-xs font-bold font-mono text-zinc-400 uppercase">
+                                    <span className="text-lg">🧀</span> Queijo Prato: <span className="text-yellow-500">ATENÇÃO</span>
+                                </span>
+                            </div>
+                        ))}
+                    </div>
                 </div>
             </header>
 
