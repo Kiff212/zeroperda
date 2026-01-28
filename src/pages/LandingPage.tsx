@@ -235,6 +235,9 @@ export function LandingPage() {
 
                             <ul className="space-y-4 mb-8 flex-1">
                                 <li className="flex items-center gap-3 text-zinc-400 text-sm">
+                                    <CheckCircle2 size={16} className="text-white" /> <span className="font-bold text-white">Tudo do Plano Pro</span>
+                                </li>
+                                <li className="flex items-center gap-3 text-zinc-400 text-sm">
                                     <CheckCircle2 size={16} className="text-white" /> Múltiplas Lojas (Filiais)
                                 </li>
                                 <li className="flex items-center gap-3 text-zinc-400 text-sm">

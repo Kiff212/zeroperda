@@ -317,6 +317,8 @@ function App() {
               <ImportPage />
             </ProtectedRoute>
           } />
+          {/* Catch-all: Redirect to Landing */}
+          <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </AuthProvider>
     </Router>
