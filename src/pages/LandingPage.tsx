@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { LandingFooter } from '../components/landing/LandingFooter';
-import { ArrowRight, AlertTriangle, TrendingDown, CheckCircle2, DollarSign } from 'lucide-react';
+import { ArrowRight, AlertTriangle, CheckCircle2, DollarSign, ShieldCheck, Database, Zap, Lock } from 'lucide-react';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -11,7 +11,7 @@ export function LandingPage() {
     const navigate = useNavigate();
     const heroRef = useRef<HTMLDivElement>(null);
     const painRef = useRef<HTMLDivElement>(null);
-    const featuresRef = useRef<HTMLDivElement>(null);
+    const pricingRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
         const ctx = gsap.context(() => {
@@ -37,13 +37,13 @@ export function LandingPage() {
                 ease: "power2.out"
             });
 
-            // Features Animation
-            gsap.from(".feature-row", {
+            // Pricing Animation
+            gsap.from(".pricing-card", {
                 scrollTrigger: {
-                    trigger: featuresRef.current,
+                    trigger: pricingRef.current,
                     start: "top 75%",
                 },
-                x: -30,
+                y: 30,
                 opacity: 0,
                 duration: 0.8,
                 stagger: 0.2,
@@ -56,23 +56,24 @@ export function LandingPage() {
 
     return (
         <div className="min-h-screen bg-black text-white font-sans selection:bg-industrial-red selection:text-white overflow-x-hidden">
+            {/* TOP BANNER */}
+            <div className="bg-industrial-red text-white text-center py-2 px-4 text-xs font-bold uppercase tracking-widest sticky top-0 z-50 shadow-lg">
+                <span className="animate-pulse mr-2">⚠️</span>
+                O desconto anual é por tempo limitado
+                <span className="animate-pulse ml-2">⚠️</span>
+            </div>
+
             {/* HERO SECTION */}
             <header ref={heroRef} className="relative min-h-[90vh] flex flex-col items-center justify-center p-6 text-center border-b border-zinc-900 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-zinc-900 via-black to-black">
                 <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 pointer-events-none"></div>
 
-                <div className="hero-text mb-6 inline-flex items-center gap-2 px-4 py-2 rounded-full border border-industrial-red/30 bg-industrial-red/10 text-industrial-red text-xs font-bold uppercase tracking-widest animate-pulse">
-                    <AlertTriangle size={14} />
-                    Método Industrial Validado
-                </div>
-
-                <h1 className="hero-text text-5xl md:text-7xl font-black uppercase tracking-tighter mb-6 leading-[0.9]">
-                    Pare de Jogar<br />
-                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-industrial-red to-red-600">Dinheiro no Lixo</span>
+                <h1 className="hero-text text-5xl md:text-7xl font-black uppercase tracking-tighter mb-6 leading-[0.9] max-w-5xl">
+                    Sua margem de lucro<br />
+                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-industrial-red to-red-600">não deveria ter data de validade.</span>
                 </h1>
 
-                <p className="hero-text text-zinc-400 text-lg md:text-xl max-w-2xl font-medium leading-relaxed mb-10">
-                    O único sistema de controle de validade focado no <span className="text-white font-bold">Custo da Omissão</span>.
-                    Monitoramento militar para supermercados e varejo.
+                <p className="hero-text text-zinc-400 text-lg md:text-xl max-w-3xl font-medium leading-relaxed mb-10">
+                    O sistema de inteligência que transforma perdas invisíveis em caixa recuperado. Deixe de reagir aos vencimentos e comece a antecipar o lucro.
                 </p>
 
                 <div className="hero-text flex flex-col md:flex-row gap-4 w-full max-w-md">
@@ -80,95 +81,178 @@ export function LandingPage() {
                         onClick={() => navigate('/intro')}
                         className="flex-1 bg-industrial-red text-white p-5 rounded-lg border-2 border-industrial-red font-black uppercase tracking-wider hover:bg-red-600 hover:scale-105 active:scale-95 transition-all shadow-[0_0_30px_rgba(239,68,68,0.3)] flex items-center justify-center gap-2 btn-glow"
                     >
-                        Começar Agora
+                        Estancar perdas agora
                         <ArrowRight size={20} strokeWidth={3} />
                     </button>
                     <button
                         onClick={() => navigate('/login')}
                         className="flex-1 bg-transparent text-zinc-400 p-5 rounded-lg border-2 border-zinc-800 font-bold uppercase tracking-wider hover:text-white hover:border-white transition-all"
                     >
-                        Já sou Cliente
+                        Já tenho acesso
                     </button>
                 </div>
             </header>
 
-            {/* PAIN SECTION */}
+            {/* CONSCIOUSNESS SECTION (MAIEUTICA) */}
             <section ref={painRef} className="py-24 px-6 border-b border-zinc-900 bg-zinc-950/50">
-                <div className="max-w-4xl mx-auto">
+                <div className="max-w-6xl mx-auto">
                     <h2 className="text-3xl font-black uppercase text-center mb-16 tracking-tight">
-                        Por que sua loja <span className="text-red-500">perde margem</span> todos os dias?
+                        O vazamento silencioso na sua operação <span className="text-zinc-600">(e como contê-lo)</span>
                     </h2>
 
                     <div className="grid md:grid-cols-3 gap-8">
+                        {/* CARD 1: O FINANCEIRO */}
                         <div className="pain-card bg-black p-8 rounded-xl border border-zinc-800 hover:border-red-500/50 transition-colors group">
                             <div className="w-12 h-12 bg-zinc-900 rounded-lg flex items-center justify-center mb-6 group-hover:bg-red-500/10 transition-colors">
                                 <DollarSign className="text-zinc-500 group-hover:text-red-500" size={24} />
                             </div>
-                            <h3 className="text-xl font-bold uppercase mb-3">Prejuízo Silencioso</h3>
+                            <h3 className="text-xl font-bold uppercase mb-3 text-white">O Custo do "Pouco"</h3>
                             <p className="text-zinc-500 text-sm leading-relaxed">
-                                Pequenas perdas de R$ 50,00 por dia somam mais de <span className="text-white font-bold">R$ 18.000,00</span> ao final do ano sem você perceber.
+                                R$ 50,00 descartados hoje parecem inofensivos. Mas multiplicados por 365 dias, tornam-se o lucro líquido de um carro popular que sua loja deixou de embolsar.
                             </p>
                         </div>
 
+                        {/* CARD 2: A REPUTAÇÃO */}
                         <div className="pain-card bg-black p-8 rounded-xl border border-zinc-800 hover:border-red-500/50 transition-colors group">
                             <div className="w-12 h-12 bg-zinc-900 rounded-lg flex items-center justify-center mb-6 group-hover:bg-red-500/10 transition-colors">
-                                <AlertTriangle className="text-zinc-500 group-hover:text-red-500" size={24} />
+                                <ShieldCheck className="text-zinc-500 group-hover:text-red-500" size={24} />
                             </div>
-                            <h3 className="text-xl font-bold uppercase mb-3">Risco Sanitário</h3>
+                            <h3 className="text-xl font-bold uppercase mb-3 text-white">A Fragilidade da Confiança</h3>
                             <p className="text-zinc-500 text-sm leading-relaxed">
-                                Um único produto vencido na prateleira pode gerar multas milionárias e destruir a reputação da sua marca.
+                                A segurança alimentar é o pilar da sua marca. Não permita que um único descuido operacional seja o motivo para seu cliente testar o concorrente.
                             </p>
                         </div>
 
+                        {/* CARD 3: O PROCESSO */}
                         <div className="pain-card bg-black p-8 rounded-xl border border-zinc-800 hover:border-red-500/50 transition-colors group">
                             <div className="w-12 h-12 bg-zinc-900 rounded-lg flex items-center justify-center mb-6 group-hover:bg-red-500/10 transition-colors">
-                                <TrendingDown className="text-zinc-500 group-hover:text-red-500" size={24} />
+                                <Database className="text-zinc-500 group-hover:text-red-500" size={24} />
                             </div>
-                            <h3 className="text-xl font-bold uppercase mb-3">Gestão Amadora</h3>
+                            <h3 className="text-xl font-bold uppercase mb-3 text-white">A Evolução da Memória</h3>
                             <p className="text-zinc-500 text-sm leading-relaxed">
-                                Planilhas e caderninhos falham. Você precisa de um sistema que te avise **antes** do problema acontecer.
+                                O erro humano é natural, mas evitável. Planilhas e anotações dependem de memória; seu negócio precisa da certeza de dados automatizados.
                             </p>
                         </div>
                     </div>
                 </div>
             </section>
 
-            {/* SOLUTION SECTION */}
-            <section ref={featuresRef} className="py-24 px-6">
-                <div className="max-w-4xl mx-auto flex flex-col md:flex-row items-center gap-12">
-                    <div className="flex-1 space-y-8">
-                        <div className="inline-block px-3 py-1 bg-industrial-yellow text-black font-black uppercase text-xs tracking-widest rounded-full">
-                            Tecnologia Especializada
-                        </div>
-                        <h2 className="text-4xl font-black uppercase leading-none">
-                            Controle Total<br />
-                            <span className="text-zinc-600">Na Palma da Mão</span>
-                        </h2>
-                        <p className="text-zinc-400 text-lg">
-                            O ZeroPerda é um sistema prático, direto e focado em resultado. Simples de usar para sua equipe, poderoso para sua gestão. Estanque o sangramento do seu caixa hoje mesmo.
-                        </p>
+            {/* PRICING SECTION */}
+            <section ref={pricingRef} className="py-24 px-6 bg-black">
+                <div className="max-w-6xl mx-auto">
+                    <h2 className="text-4xl font-black uppercase text-center mb-16 tracking-tighter">
+                        Quanto custa a <span className="text-industrial-yellow">tranquilidade</span> da sua operação?
+                    </h2>
 
-                        <div className="space-y-4">
-                            <div className="feature-row flex items-center gap-4 p-4 border border-zinc-900 bg-zinc-950 rounded-lg">
-                                <CheckCircle2 className="text-green-500" />
-                                <span className="font-bold uppercase text-sm">Alertas Críticos de 7 Dias</span>
+                    <div className="grid md:grid-cols-3 gap-8 items-stretch">
+
+                        {/* PLANO START */}
+                        <div className="pricing-card bg-zinc-900/30 border border-zinc-800 p-8 rounded-xl flex flex-col hover:border-white/30 transition-colors">
+                            <h3 className="text-2xl font-black uppercase text-white mb-2">Plano Start</h3>
+                            <span className="text-xs font-bold text-zinc-500 uppercase tracking-widest mb-6">Validação</span>
+
+                            <div className="flex items-baseline gap-1 mb-2">
+                                <span className="text-4xl font-black text-white">R$ 79,90</span>
+                                <span className="text-zinc-500 font-bold">/mês</span>
                             </div>
-                            <div className="feature-row flex items-center gap-4 p-4 border border-zinc-900 bg-zinc-950 rounded-lg">
-                                <CheckCircle2 className="text-green-500" />
-                                <span className="font-bold uppercase text-sm">Dashboard Industrial</span>
-                            </div>
-                            <div className="feature-row flex items-center gap-4 p-4 border border-zinc-900 bg-zinc-950 rounded-lg">
-                                <CheckCircle2 className="text-green-500" />
-                                <span className="font-bold uppercase text-sm">Cadastro Ultra-Rápido</span>
-                            </div>
-                            <div className="feature-row flex items-center gap-4 p-4 border border-zinc-900 bg-zinc-950 rounded-lg border-l-4 border-l-industrial-yellow">
-                                <CheckCircle2 className="text-industrial-yellow" />
-                                <div>
-                                    <span className="font-bold uppercase text-sm block">Compatível com seu ERP</span>
-                                    <span className="text-xs text-zinc-500">Não interfere no seu caixa ou fiscal</span>
-                                </div>
-                            </div>
+                            <p className="text-xs text-industrial-yellow font-bold uppercase mb-8">
+                                O custo de 2 produtos vencidos paga o sistema.
+                            </p>
+
+                            <ul className="space-y-4 mb-8 flex-1">
+                                <li className="flex items-center gap-3 text-zinc-400 text-sm">
+                                    <CheckCircle2 size={16} className="text-white" /> 1 Usuário
+                                </li>
+                                <li className="flex items-center gap-3 text-zinc-400 text-sm">
+                                    <CheckCircle2 size={16} className="text-white" /> Até 500 itens monitorados
+                                </li>
+                                <li className="flex items-center gap-3 text-zinc-400 text-sm opacity-50">
+                                    <CheckCircle2 size={16} /> Sem Backup em Nuvem
+                                </li>
+                            </ul>
+
+                            <button
+                                onClick={() => navigate('/intro')}
+                                className="w-full py-4 bg-zinc-800 text-white font-bold uppercase rounded-lg hover:bg-zinc-700 transition-all border border-zinc-700 hover:border-white"
+                            >
+                                Começar Agora
+                            </button>
                         </div>
+
+                        {/* PLANO PRO (HERO) */}
+                        <div className="pricing-card bg-zinc-900 border-2 border-industrial-red p-8 rounded-xl flex flex-col relative scale-105 shadow-[0_0_40px_rgba(239,68,68,0.2)]">
+                            <div className="absolute top-0 right-0 bg-industrial-red text-white text-[10px] font-black uppercase px-3 py-1 rounded-bl-lg">
+                                Mais Escolhido
+                            </div>
+
+                            <h3 className="text-2xl font-black uppercase text-white mb-2 flex items-center gap-2">
+                                Plano Pro <Zap size={18} className="text-industrial-yellow fill-industrial-yellow" />
+                            </h3>
+                            <span className="text-xs font-bold text-zinc-500 uppercase tracking-widest mb-6">Escala</span>
+
+                            <div className="flex items-baseline gap-1 mb-2">
+                                <span className="text-5xl font-black text-white">R$ 179,90</span>
+                                <span className="text-zinc-500 font-bold">/mês</span>
+                            </div>
+                            <p className="text-xs text-industrial-yellow font-bold uppercase mb-8">
+                                Blindagem completa contra falhas.
+                            </p>
+
+                            <ul className="space-y-4 mb-8 flex-1">
+                                <li className="flex items-center gap-3 text-white font-bold text-sm">
+                                    <CheckCircle2 size={16} className="text-industrial-red" /> Itens Ilimitados
+                                </li>
+                                <li className="flex items-center gap-3 text-white font-bold text-sm">
+                                    <CheckCircle2 size={16} className="text-industrial-red" /> 5 Usuários
+                                </li>
+                                <li className="flex items-center gap-3 text-white font-bold text-sm">
+                                    <CheckCircle2 size={16} className="text-industrial-red" /> Funciona Offline (Toalheiro)
+                                </li>
+                                <li className="flex items-center gap-3 text-white font-bold text-sm">
+                                    <CheckCircle2 size={16} className="text-industrial-red" /> Gestor Dedicado
+                                </li>
+                            </ul>
+
+                            <button
+                                onClick={() => navigate('/intro')}
+                                className="w-full py-5 bg-industrial-red text-white text-lg font-black uppercase rounded-lg hover:bg-red-600 transition-all shadow-lg btn-glow"
+                            >
+                                Quero o Pro
+                            </button>
+                        </div>
+
+                        {/* PLANO SOVEREIGN */}
+                        <div className="pricing-card bg-zinc-900/30 border border-zinc-800 p-8 rounded-xl flex flex-col hover:border-white/30 transition-colors">
+                            <h3 className="text-2xl font-black uppercase text-white mb-2">Sovereign</h3>
+                            <span className="text-xs font-bold text-zinc-500 uppercase tracking-widest mb-6">Redes & Franquias</span>
+
+                            <div className="flex items-baseline gap-1 mb-2">
+                                <span className="text-3xl font-black text-zinc-300">Sob Consulta</span>
+                            </div>
+                            <p className="text-xs text-zinc-500 font-bold uppercase mb-8">
+                                Soberania de dados total.
+                            </p>
+
+                            <ul className="space-y-4 mb-8 flex-1">
+                                <li className="flex items-center gap-3 text-zinc-400 text-sm">
+                                    <CheckCircle2 size={16} className="text-white" /> Múltiplas Lojas (Filiais)
+                                </li>
+                                <li className="flex items-center gap-3 text-zinc-400 text-sm">
+                                    <CheckCircle2 size={16} className="text-white" /> Servidor Dedicado
+                                </li>
+                                <li className="flex items-center gap-3 text-zinc-400 text-sm">
+                                    <CheckCircle2 size={16} className="text-white" /> Auditoria de Logs
+                                </li>
+                            </ul>
+
+                            <button
+                                onClick={() => window.location.href = "mailto:comercial@zeroperda.com.br"}
+                                className="w-full py-4 bg-transparent text-white font-bold uppercase rounded-lg hover:bg-white/10 transition-all border border-zinc-600 hover:border-white"
+                            >
+                                Falar com Consultor
+                            </button>
+                        </div>
+
                     </div>
                 </div>
             </section>
@@ -186,9 +270,10 @@ export function LandingPage() {
                     >
                         Parar de Perder Dinheiro
                     </button>
-                    <p className="mt-6 text-zinc-500 text-sm font-medium">
-                        Instalação Gratuita • Treinamento Incluso • Cancelamento a qualquer momento
-                    </p>
+                    <div className="mt-8 flex items-center justify-center gap-4 text-zinc-500 text-sm font-bold uppercase">
+                        <span className="flex items-center gap-2"><Lock size={14} /> Compra Segura</span>
+                        <span className="flex items-center gap-2"><ShieldCheck size={14} /> Garantia de 7 Dias</span>
+                    </div>
                 </div>
             </section>
 
