@@ -68,7 +68,7 @@ export function AddBatch() {
 
         try {
             await batchService.createBatch(section, name, parseInt(quantity), date);
-            navigate('/');
+            navigate('/dashboard');
         } catch (err: unknown) {
             console.error(err);
             setError("Erro ao salvar. Tente novamente.");

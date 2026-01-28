@@ -24,7 +24,7 @@ export function Login() {
 
             if (error) throw error;
 
-            navigate('/');
+            navigate('/dashboard');
         } catch (err: unknown) {
             const errorMessage = err instanceof Error ? err.message : "Falha na autenticação";
             setError(errorMessage);

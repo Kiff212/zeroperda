@@ -33,7 +33,7 @@ export function BottomNav() {
         <div className="fixed bottom-6 left-0 right-0 z-50 pointer-events-none">
             <div className="max-w-md mx-auto px-4 pointer-events-auto">
                 <nav className="bg-industrial text-white border-2 border-black shadow-industrial p-2 grid grid-cols-3 items-center rounded-lg">
-                    <div className="p-3 flex flex-col items-center gap-1 opacity-50 justify-self-start">
+                    <div className="p-3 flex flex-col items-center gap-1 opacity-50 justify-self-start cursor-pointer" onClick={() => navigate('/dashboard')}>
                         <span className="text-[10px] font-bold uppercase tracking-wider whitespace-nowrap">2026 - Zero Perda</span>
                     </div>
 

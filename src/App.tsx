@@ -9,6 +9,11 @@ import { BatchActionModal } from './components/batches/BatchActionModal';
 import { Login } from './pages/Login';
 import { AddBatch } from './pages/AddBatch';
 import { ImportPage } from './pages/ImportPage';
+import { LandingPage } from './pages/LandingPage';
+import { OnboardingWizard } from './pages/OnboardingWizard';
+import { PlanSelection } from './pages/PlanSelection';
+import { RegisterPage } from './pages/RegisterPage';
+
 import { batchService } from './services/batchService';
 import type { Batch } from './types/database.types';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
@@ -289,7 +294,15 @@ function App() {
     <Router>
       <AuthProvider>
         <Routes>
-          <Route path="/" element={
+          {/* Public SaaS Funnel */}
+          <Route path="/" element={<LandingPage />} />
+          <Route path="/intro" element={<OnboardingWizard />} />
+          <Route path="/checkout" element={<PlanSelection />} />
+          <Route path="/register" element={<RegisterPage />} />
+          <Route path="/login" element={<Login />} />
+
+          {/* Protected App Routes */}
+          <Route path="/dashboard" element={
             <ProtectedRoute>
               <Dashboard />
             </ProtectedRoute>
@@ -304,7 +317,6 @@ function App() {
               <ImportPage />
             </ProtectedRoute>
           } />
-          <Route path="/login" element={<Login />} />
         </Routes>
       </AuthProvider>
     </Router>
