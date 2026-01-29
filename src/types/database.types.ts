@@ -1,7 +1,7 @@
 export interface Organization {
     id: string; // uuid
     name: string;
-    plan?: string;
+    plan?: 'start' | 'pro' | 'sovereign';
     created_at?: string;
 }
 

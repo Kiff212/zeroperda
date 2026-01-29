@@ -117,7 +117,7 @@ export function PlanSelection() {
                     </ul>
 
                     <button
-                        onClick={() => navigate('/register')}
+                        onClick={() => navigate('/register', { state: { plan: 'start', cycle: billingCycle } })}
                         className="w-full py-4 bg-zinc-800 text-white font-bold uppercase rounded-lg hover:bg-zinc-700 transition-all border border-zinc-700 hover:border-zinc-500 flex items-center justify-center gap-2"
                     >
                         Selecionar Start
@@ -185,7 +185,7 @@ export function PlanSelection() {
                     </div>
 
                     <button
-                        onClick={() => navigate('/register')}
+                        onClick={() => navigate('/register', { state: { plan: 'pro', cycle: billingCycle } })}
                         className="w-full py-5 bg-industrial-red text-white text-lg font-black uppercase rounded-lg hover:bg-red-600 transition-all shadow-lg btn-glow flex items-center justify-center gap-2 group"
                     >
                         Quero o Pro

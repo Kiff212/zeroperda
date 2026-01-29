@@ -3,9 +3,15 @@ import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { AlertCircle, CheckCircle2, Loader2, Lock } from 'lucide-react';
 
+import { useLocation } from 'react-router-dom';
+
 export function RegisterPage() {
     const { signUp } = useAuth();
     const navigate = useNavigate();
+    const location = useLocation();
+
+    // Get plan from navigation state or default to start/monthly (safety fallback)
+    const { plan, cycle } = location.state || { plan: 'start', cycle: 'monthly' };
 
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -18,7 +24,11 @@ export function RegisterPage() {
         setError(null);
 
         try {
-            await signUp(email, password);
+            // Pass plan metadata to Auth Context -> Supabase -> Post-Signup Trigger
+            await signUp(email, password, {
+                plan_tier: plan,
+                billing_cycle: cycle
+            });
             navigate('/dashboard'); // Direct access after success
         } catch (err: unknown) {
             if (err instanceof Error) {
