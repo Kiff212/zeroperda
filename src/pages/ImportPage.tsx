@@ -5,8 +5,12 @@ import { BottomNav } from '../components/nav/BottomNav';
 import { ArrowLeft, FileSpreadsheet, Play, CheckCircle2, AlertCircle } from 'lucide-react';
 import { batchService } from '../services/batchService';
 
+import { useOrganization } from '../contexts/OrganizationContext';
+
 export function ImportPage() {
     const navigate = useNavigate();
+    const { currentOrg } = useOrganization();
+
     const [rawText, setRawText] = useState('');
     const [previewData, setPreviewData] = useState<{ section: string, product: string }[]>([]);
     const [loading, setLoading] = useState(false);
@@ -53,12 +57,16 @@ export function ImportPage() {
     };
 
     const handleImport = async () => {
+        if (!currentOrg) {
+            setError("Erro: Nenhuma organização detectada.");
+            return;
+        }
         if (previewData.length === 0) return;
         setLoading(true);
         setError(null);
 
         try {
-            await batchService.importProducts(previewData);
+            await batchService.importProductsManual(currentOrg.id, previewData);
             setSuccess(true);
             setRawText('');
             setPreviewData([]);

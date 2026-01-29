@@ -95,7 +95,10 @@ function SectionGroup({ sectionName, batches, onBatchClick, onAddBatch }: { sect
   );
 }
 
+import { useOrganization } from './contexts/OrganizationContext';
+
 function Dashboard() {
+  const { currentOrg, loading: orgLoading } = useOrganization();
   const [batches, setBatches] = useState<Batch[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -108,9 +111,10 @@ function Dashboard() {
   const [isCriticalOpen, setIsCriticalOpen] = useState(false);
 
   async function loadData() {
+    if (!currentOrg) return;
     try {
       setLoading(true); // Soft loading if needed, or just standard
-      const data = await batchService.getAllBatches();
+      const data = await batchService.getAllBatches(currentOrg.id);
       setBatches(data);
     } catch (err) {
       console.error(err);
@@ -121,10 +125,15 @@ function Dashboard() {
   }
 
   useEffect(() => {
+    if (currentOrg) {
+      loadData();
+    }
+  }, [currentOrg]);
+
+  useEffect(() => {
     window.addEventListener('focus', loadData);
-    loadData();
     return () => window.removeEventListener('focus', loadData);
-  }, []);
+  }, [currentOrg]); // Re-bind with new closure if org changes
 
   const handleBatchAction = async (action: 'consumed' | 'discarded' | 'delete_product') => {
     if (!selectedBatch) return;
@@ -142,14 +151,15 @@ function Dashboard() {
       await loadData();
     } catch (e: unknown) {
       console.error(e);
-      alert("Erro ao realizar ação");
+      alert("Não foi possível realizar a ação. Verifique sua conexão.");
     } finally {
       setActionLoading(false);
     }
   };
 
   const handleQuickAdd = async (productId: string, quantity: number, date: string) => {
-    await batchService.addBatchToProduct(productId, quantity, date);
+    if (!currentOrg) return;
+    await batchService.addBatchToProduct(currentOrg.id, productId, quantity, date);
     await loadData();
   };
 
@@ -173,7 +183,7 @@ function Dashboard() {
   const uniqueProductIds = new Set(batches.map(b => b.product_id));
   const totalProducts = uniqueProductIds.size;
 
-  if (loading && batches.length === 0) {
+  if (loading && batches.length === 0 || orgLoading) {
     return (
       <AppShell>
         <div className="flex h-screen items-center justify-center">
@@ -289,37 +299,44 @@ function Dashboard() {
   );
 }
 
+import { OrganizationProvider } from './contexts/OrganizationContext';
+
+import { CookieConsent } from './components/privacy/CookieConsent';
+
 function App() {
   return (
     <Router>
       <AuthProvider>
-        <Routes>
-          {/* Public SaaS Funnel */}
-          <Route path="/" element={<LandingPage />} />
-          <Route path="/intro" element={<OnboardingWizard />} />
-          <Route path="/checkout" element={<PlanSelection />} />
-          <Route path="/register" element={<RegisterPage />} />
-          <Route path="/login" element={<Login />} />
+        <OrganizationProvider>
+          <Routes>
+            {/* Public SaaS Funnel */}
+            <Route path="/" element={<LandingPage />} />
+            <Route path="/intro" element={<OnboardingWizard />} />
+            <Route path="/checkout" element={<PlanSelection />} />
+            <Route path="/register" element={<RegisterPage />} />
+            <Route path="/login" element={<Login />} />
 
-          {/* Protected App Routes */}
-          <Route path="/dashboard" element={
-            <ProtectedRoute>
-              <Dashboard />
-            </ProtectedRoute>
-          } />
-          <Route path="/add" element={
-            <ProtectedRoute>
-              <AddBatch />
-            </ProtectedRoute>
-          } />
-          <Route path="/import" element={
-            <ProtectedRoute>
-              <ImportPage />
-            </ProtectedRoute>
-          } />
-          {/* Catch-all: Redirect to Landing */}
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
+            {/* Protected App Routes */}
+            <Route path="/dashboard" element={
+              <ProtectedRoute>
+                <Dashboard />
+              </ProtectedRoute>
+            } />
+            <Route path="/add" element={
+              <ProtectedRoute>
+                <AddBatch />
+              </ProtectedRoute>
+            } />
+            <Route path="/import" element={
+              <ProtectedRoute>
+                <ImportPage />
+              </ProtectedRoute>
+            } />
+            {/* Catch-all: Redirect to Landing */}
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+          <CookieConsent />
+        </OrganizationProvider>
       </AuthProvider>
     </Router>
   );

@@ -6,8 +6,12 @@ import { ArrowLeft, Save, Loader2, AlertCircle, Calendar, Layers, Search, PlusCi
 import { batchService } from '../services/batchService';
 import type { Section, Product } from '../types/database.types';
 
+import { useOrganization } from '../contexts/OrganizationContext';
+
 export function AddBatch() {
     const navigate = useNavigate();
+    const { currentOrg } = useOrganization();
+
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
@@ -21,8 +25,10 @@ export function AddBatch() {
     const [isNewProductMode, setIsNewProductMode] = useState(false);
 
     useEffect(() => {
-        batchService.getSections().then(setExistingSections).catch(console.error);
-    }, []);
+        if (currentOrg) {
+            batchService.getSections(currentOrg.id).then(setExistingSections).catch(console.error);
+        }
+    }, [currentOrg]);
 
     // Update suggestions when section changes
     useEffect(() => {
@@ -58,6 +64,10 @@ export function AddBatch() {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        if (!currentOrg) {
+            setError("Organização não carregada");
+            return;
+        }
         if (!section || !name || !quantity || !date) {
             setError("Preencha todos os campos");
             return;
@@ -67,7 +77,7 @@ export function AddBatch() {
         setError(null);
 
         try {
-            await batchService.createBatch(section, name, parseInt(quantity), date);
+            await batchService.createBatch(currentOrg.id, section, name, parseInt(quantity), date);
             navigate('/dashboard');
         } catch (err: unknown) {
             console.error(err);

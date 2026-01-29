@@ -31,9 +31,7 @@ export function ProductGroupCard({ productName, productId, batches, onBatchClick
             setNewDate('');
         } catch (e: unknown) {
             console.error("Erro Supabase:", e);
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            const err = e as any;
-            alert(`Erro: ${err.message || err.details || JSON.stringify(e, null, 2) || "Desconhecido"}`);
+            alert("Ocorreu um erro ao processar sua solicitação. Tente novamente.");
         } finally {
             setLoading(false);
         }
