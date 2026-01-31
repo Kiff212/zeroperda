@@ -9,6 +9,7 @@ import { BatchActionModal } from './components/batches/BatchActionModal';
 import { Login } from './pages/Login';
 import { AddBatch } from './pages/AddBatch';
 import { ImportPage } from './pages/ImportPage';
+import { ImportPdf } from './pages/ImportPdf';
 import { LandingPage } from './pages/LandingPage';
 import { OnboardingWizard } from './pages/OnboardingWizard';
 import { PlanSelection } from './pages/PlanSelection';
@@ -330,6 +331,11 @@ function App() {
             <Route path="/import" element={
               <ProtectedRoute>
                 <ImportPage />
+              </ProtectedRoute>
+            } />
+            <Route path="/import-pdf" element={
+              <ProtectedRoute>
+                <ImportPdf />
               </ProtectedRoute>
             } />
             {/* Catch-all: Redirect to Landing */}

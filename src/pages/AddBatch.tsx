@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AppShell } from '../components/layout/AppShell';
 import { BottomNav } from '../components/nav/BottomNav';
-import { ArrowLeft, Save, Loader2, AlertCircle, Calendar, Layers, Search, PlusCircle } from 'lucide-react';
+import { ArrowLeft, Save, Loader2, AlertCircle, Calendar, Layers, Search, PlusCircle, FileText } from 'lucide-react';
 import { batchService } from '../services/batchService';
 import type { Categoria, Produto } from '../types/database.types';
 
@@ -103,10 +103,11 @@ export function AddBatch() {
                 </div>
 
                 <button
-                    onClick={() => navigate('/import')}
-                    className="text-xs bg-zinc-800 text-zinc-300 border border-zinc-600 px-3 py-2 font-bold uppercase tracking-wide hover:bg-zinc-700 active:bg-zinc-900"
+                    onClick={() => navigate('/import-pdf')}
+                    className="text-xs bg-industrial-yellow text-black border border-black px-3 py-2 font-black uppercase tracking-wide hover:bg-white hover:border-white shadow-industrial active:translate-x-1 active:translate-y-1 active:shadow-none transition-all flex items-center gap-2"
                 >
-                    Importar Excel
+                    <FileText size={16} />
+                    Importar PDF
                 </button>
             </header>
 
