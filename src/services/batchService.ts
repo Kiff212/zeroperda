@@ -1,18 +1,16 @@
 import { supabase } from "../lib/supabase";
-import type { Batch, Section, Product } from "../types/database.types";
+import type { Batch, Categoria, Produto } from "../types/database.types";
 
 export const batchService = {
     // Get all active batches with product details AND section details
-    // Note: RLS should handle filtering by organization_id automatically if set up correctly.
-    // However, explicitly filtering is safe if needed, but 'batches' table now has organization_id.
     async getAllBatches(organizationId: string): Promise<Batch[]> {
         if (!organizationId) throw new Error("Organization ID is required");
 
-        // Join products -> sections
+        // Join produtos -> categorias
         const { data, error } = await supabase
             .from('batches')
-            .select('*, products(*, sections(*))')
-            .eq('organization_id', organizationId) // Explicit filter for safety
+            .select('*, produtos(*, categorias(*))')
+            .eq('organization_id', organizationId)
             .neq('status', 'consumed')
             .neq('status', 'discarded')
             .order('expiration_date', { ascending: true });
@@ -24,18 +22,18 @@ export const batchService = {
         return data as Batch[];
     },
 
-    // Get all unique sections for the organization
-    async getSections(organizationId: string): Promise<Section[]> {
+    // Get all unique sections (Categories) for the organization
+    async getSections(organizationId: string): Promise<Categoria[]> {
         if (!organizationId) return [];
 
         const { data, error } = await supabase
-            .from('sections')
+            .from('categorias')
             .select('*')
-            .eq('organization_id', organizationId)
-            .order('name', { ascending: true });
+            .eq('loja_id', organizationId)
+            .order('nome', { ascending: true });
 
         if (error) throw error;
-        return data as Section[];
+        return data as Categoria[];
     },
 
     // Helper to calculate days remaining
@@ -58,51 +56,55 @@ export const batchService = {
     async createBatch(organizationId: string, sectionName: string, productName: string, quantity: number, expirationDate: string): Promise<void> {
         if (!organizationId) throw new Error("Organization ID is required");
 
-        // 1. Resolve Section
+        // 1. Resolve Section (Categoria)
         let sectionId: string;
 
-        // Check if section exists in this Org
         const { data: existingSection } = await supabase
-            .from('sections')
+            .from('categorias')
             .select('id')
-            .eq('organization_id', organizationId)
-            .ilike('name', sectionName)
-            .single();
+            .eq('loja_id', organizationId)
+            .ilike('nome', sectionName)
+            .maybeSingle();
 
         if (existingSection) {
             sectionId = existingSection.id;
         } else {
             // Create Section linked to Org
+            // NOTE: Using 'slug' is required by DB unique constraint or app logic, but for simplicity we slugify the name
+            const slug = sectionName.toLowerCase().replace(/\s+/g, '-');
             const { data: newSection, error: secError } = await supabase
-                .from('sections')
-                .insert({ organization_id: organizationId, name: sectionName }) // UPDATED to org_id
+                .from('categorias')
+                .insert({
+                    loja_id: organizationId,
+                    nome: sectionName,
+                    slug: slug + '-' + Math.random().toString(36).substr(2, 5) // Simple slug generation to avoid conflict
+                })
                 .select()
                 .single();
             if (secError) throw secError;
             sectionId = newSection.id;
         }
 
-        // 2. Resolve Product
+        // 2. Resolve Product (Produto)
         let productId: string;
         const { data: existingProduct } = await supabase
-            .from('products')
+            .from('produtos')
             .select('id')
-            .eq('organization_id', organizationId) // Scope by Org
-            .ilike('name', productName)
-            .eq('section_id', sectionId)
-            .single();
+            .eq('loja_id', organizationId)
+            .ilike('nome', productName)
+            .eq('categoria_id', sectionId)
+            .maybeSingle();
 
         if (existingProduct) {
             productId = existingProduct.id;
         } else {
             // Create Product linked to Org
             const { data: newProduct, error: prodError } = await supabase
-                .from('products')
+                .from('produtos')
                 .insert({
-                    organization_id: organizationId, // UPDATED to org_id
-                    section_id: sectionId,
-                    name: productName,
-                    category: sectionName,
+                    loja_id: organizationId,
+                    categoria_id: sectionId,
+                    nome: productName,
                     min_stock_alert: 5
                 })
                 .select()
@@ -116,7 +118,7 @@ export const batchService = {
         const { error: batchError } = await supabase
             .from('batches')
             .insert({
-                organization_id: organizationId, // UPDATED to org_id
+                organization_id: organizationId,
                 product_id: productId,
                 quantity,
                 expiration_date: expirationDate,
@@ -141,7 +143,7 @@ export const batchService = {
         const { error } = await supabase
             .from('batches')
             .insert({
-                organization_id: organizationId, // UPDATED to org_id
+                organization_id: organizationId,
                 product_id: productId,
                 quantity,
                 expiration_date: expirationDate,
@@ -152,84 +154,60 @@ export const batchService = {
     },
 
     async deleteProduct(productId: string): Promise<void> {
-        // RLS Policies ensure we can only delete our own products
         const { error } = await supabase
-            .from('products')
+            .from('produtos')
             .delete()
             .eq('id', productId);
 
         if (error) throw error;
     },
 
-    async importProducts(_items: { section: string; product: string }[]): Promise<void> {
-        // RPC Call - Backend handles Organization ID via auth.uid() lookup usually, 
-        // OR we pass it if the RPC expects it. 
-        // The user prompt said: "A função import_product_item agora descobre a org sozinha no backend"
-        // So we just need to make sure we call it correctly.
-        // However, the previous implementation was doing manual loops (for loop).
-        // If we keep the manual loop, we need organizationId. 
-        // If we use RPC, we call the RPC. 
-        // The user said: "A função import_product_item agora descobre a org sozinha no backend"
-        // BUT, the code viewed above was NOT using an RPC called import_product_item. It was doing manual inserts.
-        // I should probably SWITH to using the RPC if it exists, or update this manual loop to use org_id.
-        // Given I don't see the RPC call in the previous code, I will update the MANUAL loop to use org_id for safety.
-        // To do that, I need to accept organizationId as param.
-
-        // WAIT: The prompt says "A função import_product_item agora descobre a org sozinha no backend, então a chamada no front continua simples, mas verifique se há erros de tipagem."
-        // This implies I SHOULD be using an RPC. 
-        // Let's implement the `importProducts` using the RPC `import_product_item` if that's what's desired, 
-        // OR just update the current manual logic to be multi-tenant compatible. 
-        // Since I don't have the RPC definition, I'll stick to updating the manual logic to ensure it works 100% with the new schema.
-        // It's safer. I'll add `organizationId` to the params.
-        throw new Error("Use import_product_item RPC or update this function with orgId. Legacy function deprecated.");
-    },
-
-    // New Import Method supporting Org ID (Manual version for robustness if RPC fails or non-existent)
     async importProductsManual(organizationId: string, items: { section: string; product: string }[]): Promise<void> {
         if (!organizationId) throw new Error("Organization ID is required");
 
+        // NOTE: This manual implementation is fallback. Ideally use RPC if available.
         for (const item of items) {
             const sectionName = item.section.trim().toUpperCase();
             const productName = item.product.trim().toUpperCase();
 
-            // 1. Resolve Section
-            let sectionId: string;
+            // 1. Resolve Categoria
+            let categoriaId: string;
             const { data: existingSection } = await supabase
-                .from('sections')
+                .from('categorias')
                 .select('id')
-                .eq('organization_id', organizationId)
-                .ilike('name', sectionName)
+                .eq('loja_id', organizationId)
+                .ilike('nome', sectionName)
                 .maybeSingle();
 
             if (existingSection) {
-                sectionId = existingSection.id;
+                categoriaId = existingSection.id;
             } else {
+                const slug = sectionName.toLowerCase().replace(/\s+/g, '-') + '-' + Math.floor(Math.random() * 1000);
                 const { data: newSection, error: secError } = await supabase
-                    .from('sections')
-                    .insert({ organization_id: organizationId, name: sectionName })
+                    .from('categorias')
+                    .insert({ loja_id: organizationId, nome: sectionName, slug })
                     .select()
                     .single();
                 if (secError) throw secError;
-                sectionId = newSection.id;
+                categoriaId = newSection.id;
             }
 
-            // 2. Resolve Product
+            // 2. Resolve Produto
             const { data: existingProduct } = await supabase
-                .from('products')
+                .from('produtos')
                 .select('id')
-                .eq('organization_id', organizationId)
-                .eq('section_id', sectionId)
-                .ilike('name', productName)
+                .eq('loja_id', organizationId)
+                .eq('categoria_id', categoriaId)
+                .ilike('nome', productName)
                 .maybeSingle();
 
             if (!existingProduct) {
                 const { error: prodError } = await supabase
-                    .from('products')
+                    .from('produtos')
                     .insert({
-                        organization_id: organizationId,
-                        section_id: sectionId,
-                        name: productName,
-                        category: sectionName,
+                        loja_id: organizationId,
+                        categoria_id: categoriaId,
+                        nome: productName,
                         min_stock_alert: 5
                     });
                 if (prodError) throw prodError;
@@ -237,15 +215,15 @@ export const batchService = {
         }
     },
 
-    async getProductsBySection(sectionId: string): Promise<Product[]> {
+    async getProductsBySection(sectionId: string): Promise<Produto[]> {
         const { data, error } = await supabase
-            .from('products')
+            .from('produtos')
             .select('*')
-            .eq('section_id', sectionId)
-            .order('name', { ascending: true });
+            .eq('categoria_id', sectionId)
+            .order('nome', { ascending: true });
 
         if (error) throw error;
-        return data as Product[];
+        return data as Produto[];
     }
 };
 

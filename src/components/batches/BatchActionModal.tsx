@@ -38,7 +38,7 @@ export function BatchActionModal({ batch, onClose, onAction, loading }: BatchAct
                         Gerenciar Item
                     </span>
                     <h2 className="text-2xl font-black uppercase text-white leading-tight">
-                        {batch.products?.name}
+                        {batch.produtos?.nome}
                     </h2>
                     <p className="text-zinc-400 font-mono text-sm mt-1">
                         Validade: {batch.expiration_date.split('-').reverse().join('/')} • Qtd: {batch.quantity}

@@ -13,36 +13,39 @@ export interface OrganizationMember {
     created_at?: string;
 }
 
-export interface Section {
+export interface Categoria {
     id: string; // uuid
-    organization_id: string; // uuid (replaced user_id)
-    name: string;
+    loja_id: string; // uuid (replaced organization_id)
+    nome: string;
+    slug: string;
     created_at?: string;
 }
 
-export interface Product {
+export interface Produto {
     id: string; // uuid
-    organization_id: string; // uuid (replaced user_id)
-    section_id?: string; // FK to sections
+    loja_id: string; // uuid (replaced organization_id)
+    categoria_id?: string; // FK to sections
     created_at?: string;
-    name: string;
-    category?: string;
+    nome: string;
+    ean?: string;
+    medida?: string;
+    ativo?: boolean;
     image_url?: string;
     min_stock_alert?: number;
 
     // Joined fields
-    sections?: Section;
+    categorias?: Categoria;
 }
 
 export interface Batch {
     id: string; // uuid
     created_at?: string;
-    organization_id: string; // uuid
+    organization_id: string; // uuid (Note: SQL for batches still says organization_id in some places, but we should align if possible. Keeping as is per current code until verified, but usually it links to products)
     product_id: string; // FK to products
     quantity: number;
     expiration_date: string;
     status?: 'active' | 'consumed' | 'discarded';
 
     // Joined fields
-    products?: Product;
+    produtos?: Produto;
 }

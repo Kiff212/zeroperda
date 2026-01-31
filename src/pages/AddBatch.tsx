@@ -4,7 +4,7 @@ import { AppShell } from '../components/layout/AppShell';
 import { BottomNav } from '../components/nav/BottomNav';
 import { ArrowLeft, Save, Loader2, AlertCircle, Calendar, Layers, Search, PlusCircle } from 'lucide-react';
 import { batchService } from '../services/batchService';
-import type { Section, Product } from '../types/database.types';
+import type { Categoria, Produto } from '../types/database.types';
 
 import { useOrganization } from '../contexts/OrganizationContext';
 
@@ -20,8 +20,8 @@ export function AddBatch() {
     const [quantity, setQuantity] = useState('');
     const [date, setDate] = useState('');
 
-    const [existingSections, setExistingSections] = useState<Section[]>([]);
-    const [suggestedProducts, setSuggestedProducts] = useState<Product[]>([]);
+    const [existingSections, setExistingSections] = useState<Categoria[]>([]);
+    const [suggestedProducts, setSuggestedProducts] = useState<Produto[]>([]);
     const [isNewProductMode, setIsNewProductMode] = useState(false);
 
     useEffect(() => {
@@ -38,7 +38,7 @@ export function AddBatch() {
             return;
         }
 
-        const secObj = existingSections.find(s => s.name === section);
+        const secObj = existingSections.find(s => s.nome === section);
         if (secObj) {
             batchService.getProductsBySection(secObj.id)
                 .then(products => {
@@ -132,21 +132,21 @@ export function AddBatch() {
                                     <button
                                         key={s.id}
                                         type="button"
-                                        onClick={() => setSection(s.name)}
+                                        onClick={() => setSection(s.nome)}
                                         className={`
                                 flex-shrink-0 snap-start
                                 min-w-[100px] p-3 border-2
                                 flex flex-col items-start gap-1
                                 transition-all
-                                ${section === s.name
+                                ${section === s.nome
                                                 ? 'bg-industrial-yellow border-white text-black shadow-[2px_2px_0px_white]'
                                                 : 'bg-zinc-900 border-zinc-700 text-zinc-400 hover:border-zinc-500'
                                             }
                             `}
                                     >
-                                        <span className={`text-[9px] font-bold uppercase ${section === s.name ? 'opacity-80' : 'opacity-50'}`}>Sessão</span>
+                                        <span className={`text-[9px] font-bold uppercase ${section === s.nome ? 'opacity-80' : 'opacity-50'}`}>Sessão</span>
                                         <span className="font-extrabold text-xs uppercase leading-tight text-left">
-                                            {s.name}
+                                            {s.nome}
                                         </span>
                                     </button>
                                 ))}
@@ -164,7 +164,7 @@ export function AddBatch() {
                         />
                         <datalist id="sections-list">
                             {existingSections.map(s => (
-                                <option key={s.id} value={s.name} />
+                                <option key={s.id} value={s.nome} />
                             ))}
                         </datalist>
                     </div>
@@ -217,8 +217,8 @@ export function AddBatch() {
                                 >
                                     <option value="" disabled>SELECIONE O PRODUTO...</option>
                                     {suggestedProducts.map(p => (
-                                        <option key={p.id} value={p.name}>
-                                            {p.name}
+                                        <option key={p.id} value={p.nome}>
+                                            {p.nome}
                                         </option>
                                     ))}
                                     <option value="___NEW___" className="font-bold text-industrial-yellow">➕ NOVO PRODUTO...</option>

@@ -42,7 +42,7 @@ function SectionGroup({ sectionName, batches, onBatchClick, onAddBatch }: { sect
     const prodId = batch.product_id;
     if (!groupedByProduct[prodId]) {
       groupedByProduct[prodId] = {
-        name: batch.products?.name || 'Item sem nome',
+        name: batch.produtos?.nome || 'Item sem nome',
         batches: []
       };
     }
@@ -140,8 +140,8 @@ function Dashboard() {
     setActionLoading(true);
     try {
       if (action === 'delete_product') {
-        if (selectedBatch.products?.id) {
-          await batchService.deleteProduct(selectedBatch.products.id);
+        if (selectedBatch.produtos?.id) {
+          await batchService.deleteProduct(selectedBatch.produtos.id);
         }
       } else {
         await batchService.updateBatchStatus(selectedBatch.id, action);
@@ -169,7 +169,7 @@ function Dashboard() {
   // Group by Section
   const groupedBatches: Record<string, Batch[]> = {};
   batches.forEach(batch => {
-    const sectionName = batch.products?.sections?.name || 'Sem Sessão';
+    const sectionName = batch.produtos?.categorias?.nome || 'Sem Sessão';
     if (!groupedBatches[sectionName]) {
       groupedBatches[sectionName] = [];
     }
@@ -240,7 +240,7 @@ function Dashboard() {
                       const days = batchService.getDaysRemaining(batch.expiration_date);
                       return (
                         <tr key={'crit-' + batch.id} className="hover:bg-white/5 transition-colors">
-                          <td className="p-3 font-bold text-white uppercase">{batch.products?.name || 'Desconhecido'}</td>
+                          <td className="p-3 font-bold text-white uppercase">{batch.produtos?.nome || 'Desconhecido'}</td>
                           <td className="p-3 text-center font-mono font-bold text-industrial-red">
                             {days <= 0 ? (
                               <span className="animate-pulse">VENCIDO</span>
