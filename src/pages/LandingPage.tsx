@@ -4,7 +4,7 @@ import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { LandingFooter } from '../components/landing/LandingFooter';
 import { ArrowRight, AlertTriangle, CheckCircle2, DollarSign, ShieldCheck, Database, Zap, Lock } from 'lucide-react';
-import { getPrice, getAnnualTotal } from '../config/pricing';
+import { getPrice } from '../config/pricing';
 
 gsap.registerPlugin(ScrollTrigger);
 
