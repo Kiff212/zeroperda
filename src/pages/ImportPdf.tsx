@@ -7,7 +7,6 @@ import { batchService } from '../services/batchService';
 import { parseInvoicePDF, type ParsedItem } from '../utils/pdfParser';
 import { ArrowLeft, Upload, Loader2, AlertCircle, Save, Trash2, CheckCircle2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import type { Categoria } from '../types/database.types';
 
 export function ImportPdf() {
     const navigate = useNavigate();
