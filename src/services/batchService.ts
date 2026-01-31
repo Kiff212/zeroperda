@@ -56,7 +56,7 @@ export const batchService = {
     async createBatch(organizationId: string, sectionName: string, productName: string, quantity: number, expirationDate: string): Promise<void> {
         if (!organizationId) throw new Error("Organization ID is required");
 
-        // 1. Resolve Section (Categoria)
+        // 1. Resolve Target Section (Categoria)
         let sectionId: string;
 
         const { data: existingSection } = await supabase
@@ -70,7 +70,6 @@ export const batchService = {
             sectionId = existingSection.id;
         } else {
             // Create Section linked to Org
-            // NOTE: Using 'slug' is required by DB unique constraint or app logic, but for simplicity we slugify the name
             const slug = sectionName.toLowerCase().replace(/\s+/g, '-');
             const { data: newSection, error: secError } = await supabase
                 .from('categorias')
@@ -85,18 +84,30 @@ export const batchService = {
             sectionId = newSection.id;
         }
 
-        // 2. Resolve Product (Produto)
+        // 2. Resolve Product (Produto) - GLOBAL SEARCH
+        // We look for product by name in THIS store, regardless of category.
         let productId: string;
         const { data: existingProduct } = await supabase
             .from('produtos')
-            .select('id')
+            .select('id, categoria_id')
             .eq('loja_id', organizationId)
             .ilike('nome', productName)
-            .eq('categoria_id', sectionId)
-            .maybeSingle();
+            .maybeSingle(); // Changed to maybeSingle (no category filter)
 
         if (existingProduct) {
             productId = existingProduct.id;
+
+            // CHECK MIGRATION: If product is in a DIFFERENT category (e.g. IMPORTADOS)
+            // and we are adding it to a specific section (e.g. AÇOUGUE),
+            // we MOVE the product to the new section.
+            if (existingProduct.categoria_id !== sectionId) {
+                console.log(`Migrating product ${productName} from cat ${existingProduct.categoria_id} to ${sectionId}`);
+                await supabase
+                    .from('produtos')
+                    .update({ categoria_id: sectionId })
+                    .eq('id', productId);
+            }
+
         } else {
             // Create Product linked to Org
             const { data: newProduct, error: prodError } = await supabase
@@ -277,6 +288,21 @@ export const batchService = {
             .select('*')
             .eq('categoria_id', sectionId)
             .order('nome', { ascending: true });
+
+        if (error) throw error;
+        return data as Produto[];
+    },
+
+    // New: Search products across ALL sections (for Import migration)
+    async searchAllProducts(organizationId: string, query: string): Promise<Produto[]> {
+        if (!query || query.length < 2) return [];
+
+        const { data, error } = await supabase
+            .from('produtos')
+            .select('*')
+            .eq('loja_id', organizationId)
+            .ilike('nome', `%${query}%`)
+            .limit(10); // Limit results for performance
 
         if (error) throw error;
         return data as Produto[];

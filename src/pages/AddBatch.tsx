@@ -30,7 +30,31 @@ export function AddBatch() {
         }
     }, [currentOrg]);
 
-    // Update suggestions when section changes
+    // Generic Product Search Effect
+    useEffect(() => {
+        // If we have suggestions from "Section Change", keep them.
+        // But if user types something custom, search GLOBALLY (to find IMPORTADOS items).
+
+        const delayDebounceFn = setTimeout(async () => {
+            if (name.length > 2 && currentOrg) {
+                // If the name typed matches one of the suggestedProducts (from current section), do nothing extra.
+                const alreadySuggested = suggestedProducts.some(p => p.nome.toUpperCase() === name.toUpperCase());
+
+                if (!alreadySuggested) {
+                    // Search Global
+                    const globalMatches = await batchService.searchAllProducts(currentOrg.id, name);
+                    if (globalMatches.length > 0) {
+                        setSuggestedProducts(globalMatches);
+                        setIsNewProductMode(false); // Enable dropdown selection mode if we found something
+                    }
+                }
+            }
+        }, 500);
+
+        return () => clearTimeout(delayDebounceFn);
+    }, [name, currentOrg]);
+
+    // Update suggestions when section changes (Initial Load for Section)
     useEffect(() => {
         if (!section) {
             setSuggestedProducts([]);
@@ -43,22 +67,19 @@ export function AddBatch() {
             batchService.getProductsBySection(secObj.id)
                 .then(products => {
                     setSuggestedProducts(products);
-                    // Standard logic: if products exist, show dropdown (mode=false), else show input (mode=true)
-                    /* 
-                       Logic refinement: 
-                       - If I want to force dropdown when products exist: setIsNewProductMode(products.length === 0);
-                       - But if I want to keep user's choice if they already switched... 
-                         Actually, usually when changing section, we should reset to "default" behavior for that section.
-                    */
                     setIsNewProductMode(products.length === 0);
-                    setName(''); // Clear name on section change
+                    // setName(''); // User might have typed something before selecting section, don't clear?
+                    // actually clear is safer to avoid confusion unless we are migrating.
+                    // Let's clear ONLY if the name field is empty or user hasn't typed much
+                    if (name.length < 2) setName('');
                 })
                 .catch(console.error);
         } else {
-            // New section (typed manually) -> always new product
+            // New section (typed manually)
             setSuggestedProducts([]);
+            // Don't force new product mode immediately if we might find it globally, 
+            // but for a new section, usually it's a new product.
             setIsNewProductMode(true);
-            setName('');
         }
     }, [section, existingSections]);
 
@@ -219,7 +240,7 @@ export function AddBatch() {
                                     <option value="" disabled>SELECIONE O PRODUTO...</option>
                                     {suggestedProducts.map(p => (
                                         <option key={p.id} value={p.nome}>
-                                            {p.nome}
+                                            {p.nome} {p.categoria_id && p.categoria_id !== existingSections.find(s => s.nome === section)?.id ? '(MIGRAR)' : ''}
                                         </option>
                                     ))}
                                     <option value="___NEW___" className="font-bold text-industrial-yellow">➕ NOVO PRODUTO...</option>
