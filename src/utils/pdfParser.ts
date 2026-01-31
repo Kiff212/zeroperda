@@ -70,7 +70,7 @@ function extractItemsFromText(text: string): ParsedItem[] {
     const items: ParsedItem[] = [];
 
     // Normalize text: remove multiple spaces
-    const lines = text.split('\n');
+    // const lines = text.split('\n'); // Unused
 
     // Regex Explanation:
     // 1. (?:^|\s) -> Start match at start of string or whitespace
@@ -91,7 +91,7 @@ function extractItemsFromText(text: string): ParsedItem[] {
     // Let's refine the blob regex.
     // We look for: <Possible Code/Junk> <NAME STARTS WITH LETTER> ... <UNIT PATTERN> <Junk Prices>
 
-    const itemRegex = /[^a-zA-Z\n]*([a-zA-Z][^0-9\n]*(?:\d+(?:[.,]\d+)?\s*(?:KG|L|ML|G|UN|CX|PC|FD|M|LITRO))?)(.*)/gi;
+    // const itemRegex = ... // Unused
 
     // Issue: The regex above consumes the rest of the line in group 3.
     // We want to extract the Name up to the Unit.

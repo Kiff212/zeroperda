@@ -1,11 +1,11 @@
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { AppShell } from '../components/layout/AppShell';
 import { BottomNav } from '../components/nav/BottomNav';
 import { useOrganization } from '../contexts/OrganizationContext';
 import { batchService } from '../services/batchService';
 import { parseInvoicePDF, type ParsedItem } from '../utils/pdfParser';
-import { ArrowLeft, Upload, Loader2, Check, AlertCircle, Save, Trash2, FileText, CheckCircle2 } from 'lucide-react';
+import { ArrowLeft, Upload, Loader2, AlertCircle, Save, Trash2, CheckCircle2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import type { Categoria } from '../types/database.types';
 
