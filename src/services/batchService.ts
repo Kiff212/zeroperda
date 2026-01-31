@@ -137,6 +137,62 @@ export const batchService = {
         if (error) throw error;
     },
 
+    async createProductOnly(organizationId: string, sectionName: string, productName: string): Promise<void> {
+        if (!organizationId) throw new Error("Organization ID is required");
+
+        // 1. Resolve Section (Categoria)
+        let sectionId: string;
+        const { data: existingSection } = await supabase
+            .from('categorias')
+            .select('id')
+            .eq('loja_id', organizationId)
+            .ilike('nome', sectionName)
+            .maybeSingle();
+
+        if (existingSection) {
+            sectionId = existingSection.id;
+        } else {
+            // Create Section
+            const slug = sectionName.toLowerCase().replace(/\s+/g, '-');
+            const { data: newSection, error: secError } = await supabase
+                .from('categorias')
+                .insert({
+                    loja_id: organizationId,
+                    nome: sectionName,
+                    slug: slug + '-' + Math.random().toString(36).substr(2, 5)
+                })
+                .select()
+                .single();
+            if (secError) throw secError;
+            sectionId = newSection.id;
+        }
+
+        // 2. Resolve Product (Produto)
+        // Check if exists
+        const { data: existingProduct } = await supabase
+            .from('produtos')
+            .select('id')
+            .eq('loja_id', organizationId)
+            .ilike('nome', productName)
+            .eq('categoria_id', sectionId)
+            .maybeSingle();
+
+        if (!existingProduct) {
+            // Create Product
+            const { error: prodError } = await supabase
+                .from('produtos')
+                .insert({
+                    loja_id: organizationId,
+                    categoria_id: sectionId,
+                    nome: productName,
+                    min_stock_alert: 5
+                });
+
+            if (prodError) throw prodError;
+        }
+        // If exists, do nothing (Idempotent)
+    },
+
     async addBatchToProduct(organizationId: string, productId: string, quantity: number, expirationDate: string): Promise<void> {
         if (!organizationId) throw new Error("Organization ID is required");
 

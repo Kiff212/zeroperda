@@ -60,95 +60,77 @@ export async function parseInvoicePDF(file: File): Promise<ParsedItem[]> {
 
 // We want: Name="LEITE INT 1L", Unit="1L" (or infer unit from end of name).
 
+
 function extractItemsFromText(text: string): ParsedItem[] {
     const items: ParsedItem[] = [];
 
-    // Normalize text: remove multiple spaces
-    // const lines = text.split('\n'); // Unused
-
-    // Regex Explanation:
-    // 1. (?:^|\s) -> Start match at start of string or whitespace
-    // 2. (?![0-9]) -> Negative lookahead: Make sure we don't start matching on a number (Code)
-    // 3. ([a-zA-Z].*?) -> Capture Group 1 (Name): Start with a letter, match anything lazily...
-    // 4. \s+ -> Space separator
-    // 5. (\d+(?:[.,]\d+)?\s*(?:KG|L|ML|G|UN|CX|PC|FD|M|LITRO|GRAMAS|MILILITRO)) -> Capture Group 2 (Qty+Unit or Unit Pattern)
-    //    We look for a number followed by Unit. 
-    //    CRITICAL: This patterns often appear TWICE. Once in Name (Coca 2L) and once in Qty (10 UN).
-
-    // Simpler heuristic per user request:
-    // "Ignore anything before first letter"
-    // "Ignore anything after unit in the name"
-
-    // Let's process line by line (assuming PDF.js output newline roughly correctly) or just regex the whole blob.
-    // Given the previous "join space" strategy, we operate on a blob.
-
-    // Let's refine the blob regex.
-    // We look for: <Possible Code/Junk> <NAME STARTS WITH LETTER> ... <UNIT PATTERN> <Junk Prices>
-
-    // const itemRegex = ... // Unused
-
-    // Issue: The regex above consumes the rest of the line in group 3.
-    // We want to extract the Name up to the Unit.
-
-    // Let's try finding the pattern:  "NAME ... UNIT"
-    // And assume the first occurrence of a Unit pattern ENDS the name.
-
-    const complexRegex = /([a-zA-Z][a-zA-Z0-9\s\.\-\/]*?)\s(\d+(?:[.,]\d+)?\s*(?:KG|L|ML|G|UN|CX|PC|FD|M))/gi;
-
-    // Use normalized text with spaces
+    // Normalize text (join lines with space just in case, though usually input is already joined per page)
     const normalized = text.replace(/\s+/g, ' ');
 
+    // Strategy: Match the TABULAR structure visible in screenshot.
+    // Row Pattern:  [ID] [DESCRIPTION] [UNIT_COLUMN]
+    // ID: Number
+    // Unit Column: UN, KG, L, CX, PC, FD, M, G (Standalone)
+
+    // Regex Captures:
+    // Group 1: ID (for debug/verification)
+    // Group 2: Raw Description (Everything between ID and Unit Column)
+    // Group 3: Unit Column (Type)
+
+    const rowRegex = /\b(\d+)\s+([a-zA-Z0-9].*?)\s+(KG|UN|L|CX|PC|FD|M|LITRO|GRAMAS|ML|UND)\b/gi;
+
     let match;
-    while ((match = complexRegex.exec(normalized)) !== null) {
-        let nameCandidate = match[1].trim();
-        const unitCandidate = match[2].trim(); // e.g. "2L" or "10 UN"
+    while ((match = rowRegex.exec(normalized)) !== null) {
+        const id = match[1];
+        let rawName = match[2].trim();
+        const columnUnit = match[3];
 
-        // Filter out very short names or headers
-        if (nameCandidate.length < 3 || nameCandidate.match(/CÓDIGO|DESCRIÇÃO|QTD|VALOR|TOTAL|ICMS/i)) continue;
+        // Filter out headers
+        if (rawName.match(/DESCRIÇÃO|PRODUTO|DETALHE/i)) continue;
 
-        // User Rule: "Ignore everything before first letter of name"
-        // Our regex starts with [a-zA-Z], so it already skips leading numbers/codes.
+        // USER RULE: "Ignore everything after the unit of measure which usually stays in the name"
+        // Example: "Coca Cola 2L Promoção" -> "Coca Cola 2L"
+        // We look for an "Embedded Unit" pattern inside the name.
 
-        // User Rule: "Ignore everything after unit"
-        // Our regex stops capturing Name at the unit boundary match.
-        // BUT: "Coca Cola 2L" -> Name="Coca Cola", Unit="2L". 
-        // We should combine them for the full Product Name.
-        const fullName = `${nameCandidate} ${unitCandidate}`;
+        // Regex for Embedded Unit (e.g., 2L, 600ml, 5kg, 170g)
+        // Must be a number followed immediately (or space) by unit code.
+        // We capture the END of this pattern to slice the string.
 
-        // Naive Quantity Extraction:
-        // We need the quantity which usually follows...
-        // The regex `complexRegex` might have matched "Coca Cola" (Name) and "2L" (Unit).
-        // Where is the Quantity? "10 UN" might be next.
+        const embeddedUnitRegex = /(\d+(?:[.,]\d+)?\s*(?:KG|K|L|ML|M|G|GRAMAS|LITROS?|MILILITROS?))\b/i;
+        const embeddedMatch = rawName.match(embeddedUnitRegex);
 
-        // Let's peek ahead in the string for the next number.
-        const nextPartStart = complexRegex.lastIndex;
-        const lookAhead = normalized.substring(nextPartStart, nextPartStart + 20); // Look at next 20 chars
+        let finalName = rawName;
+        // let inferredQuantity = 1; // Default
 
-        // Look for a number in the lookAhead
-        const qtyMatch = lookAhead.match(/(\d+(?:[.,]\d+)?)/);
-        let quantity = 1; // Default
+        if (embeddedMatch) {
+            // Found a unit in the name!
+            // embeddedMatch[0] is the full unit string (e.g., "170g")
+            // embeddedMatch.index is where it starts.
 
-        if (qtyMatch) {
-            quantity = parseFloat(qtyMatch[1].replace(',', '.'));
+            // Cut the string immediately after this unit.
+            // + match length
+            const cutIndex = (embeddedMatch.index || 0) + embeddedMatch[0].length;
+            finalName = rawName.substring(0, cutIndex).trim();
         }
 
-        // Deduplicate?
-        // Sometimes "Coca Cola 2L" matches, then later "10 UN" might match as a name if we are not careful?
-        // "UN" is unlikely to match [a-zA-Z] start unless strictly enforced?
-        // "UN" is letters. So "UN" could be a name.
-        if (nameCandidate.toUpperCase() === 'UN' || nameCandidate.toUpperCase() === 'CX') continue;
+        // Fallback: If no embedded unit found (e.g. "Pão Francês"), we keep the full name captured before the UN column.
+
+        // QUANTITY RULE: User said "não quero que reconheça nenhum tipo de quantidade".
+        // Means we should default to 0 or 1, and let user input manually or assume batch = stock entry.
+        // The previous bug was "170" from "Iogurte 170g" becoming quantity.
+        // This happened because we tried to parse numbers *after* the name regex.
+        // Since we are NOT looking for quantity anymore, we set it to 0 (or 1 as default batch count).
 
         items.push({
-            name: fullName,
-            quantity: quantity > 0 ? quantity : 1,
-            unit: unitCandidate,
+            name: finalName,
+            quantity: 1, // Default to 1 per user request (was reading "170" wrongly)
+            unit: columnUnit,
             unitPrice: 0,
             total: 0,
-            originalLine: match[0] + ' ' + lookAhead,
+            originalLine: `ID:${id} ${rawName} [${columnUnit}]`,
             suggestedCategory: undefined
         });
     }
 
     return items;
 }
-

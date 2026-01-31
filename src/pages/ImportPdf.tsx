@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { AppShell } from '../components/layout/AppShell';
 import { BottomNav } from '../components/nav/BottomNav';
 import { useOrganization } from '../contexts/OrganizationContext';
@@ -14,28 +14,26 @@ export function ImportPdf() {
     const { currentOrg } = useOrganization();
 
     // State
+    // State
     const [file, setFile] = useState<File | null>(null);
     const [parsedItems, setParsedItems] = useState<ParsedItem[]>([]);
-    const [categories, setCategories] = useState<Categoria[]>([]);
 
-    // Loading States
+    // UI State
     const [isParsing, setIsParsing] = useState(false);
     const [isSaving, setIsSaving] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [successCount, setSuccessCount] = useState<number | null>(null);
 
-    // Selection State
     const [selectedIndices, setSelectedIndices] = useState<number[]>([]);
-    const [globalCategory, setGlobalCategory] = useState<string>(""); // ID of selected category for bulk apply
 
-    // Load Categories on mount
+
+    /*
     useEffect(() => {
         if (currentOrg) {
-            batchService.getSections(currentOrg.id)
-                .then(setCategories)
-                .catch(console.error);
+            batchService.getSections(currentOrg.id).then(setCategories).catch(console.error);
         }
     }, [currentOrg]);
+    */
 
     const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files && e.target.files[0]) {
@@ -80,30 +78,13 @@ export function ImportPdf() {
         }
     };
 
-    const applyCategoryToSelected = () => {
-        if (!globalCategory) return;
-
-        // Find category name for display/logic if needed, but we store ID usually? 
-        // Actually parser stores "suggestedCategory" which matches name usually, but let's store Name for now to match current BatchService logic
-        // BatchService.createBatch takes "SectionName".
-
-        const cat = categories.find(c => c.id === globalCategory);
-        if (!cat) return;
-
-        const updated = [...parsedItems];
-        selectedIndices.forEach(idx => {
-            updated[idx].suggestedCategory = cat.nome;
-        });
-        setParsedItems(updated);
-        setSelectedIndices([]); // Clear selection after apply
-    };
 
     const handleSave = async () => {
         if (!currentOrg) return;
 
-        const validItems = parsedItems.filter(i => i.suggestedCategory);
+        const validItems = parsedItems.filter((_, idx) => selectedIndices.includes(idx));
         if (validItems.length === 0) {
-            setError("Categorize pelo menos um item antes de salvar.");
+            setError("Selecione pelo menos um item para salvar.");
             return;
         }
 
@@ -114,17 +95,11 @@ export function ImportPdf() {
         try {
             // Sequential save (could be parallel but safer sequential for rate limits)
             for (const item of validItems) {
-                // Default expiration: 30 days from now (User can edit later)
-                const defaultExp = new Date();
-                defaultExp.setDate(defaultExp.getDate() + 30);
-                const dateStr = defaultExp.toISOString().split('T')[0];
-
-                await batchService.createBatch(
+                // Product Only - No Batches created
+                await batchService.createProductOnly(
                     currentOrg.id,
-                    item.suggestedCategory!,
-                    item.name,
-                    item.quantity,
-                    dateStr
+                    'IMPORTADOS', // Default Section per user request
+                    item.name
                 );
                 saved++;
             }
@@ -159,7 +134,7 @@ export function ImportPdf() {
                     </div>
                     <h1 className="text-3xl font-black text-white uppercase mb-2">Sucesso!</h1>
                     <p className="text-zinc-400 mb-8 max-w-xs mx-auto">
-                        {successCount} itens foram importados para o seu estoque com validade padrão de 30 dias.
+                        {successCount} produtos foram cadastrados na sua base de dados.
                     </p>
                     <button
                         onClick={() => { setSuccessCount(null); navigate('/dashboard'); }}
@@ -237,36 +212,18 @@ export function ImportPdf() {
                                 <span className="text-xs font-bold uppercase text-zinc-500 whitespace-nowrap">
                                     {selectedIndices.length} selecionados
                                 </span>
-                                <select
-                                    value={globalCategory}
-                                    onChange={(e) => setGlobalCategory(e.target.value)}
-                                    className="bg-black border border-zinc-600 text-white text-sm p-2 rounded w-full md:w-48 outline-none focus:border-industrial-yellow"
-                                >
-                                    <option value="">Definir Categoria...</option>
-                                    {categories.map(c => (
-                                        <option key={c.id} value={c.id}>{c.nome}</option>
-                                    ))}
-                                </select>
-                                <button
-                                    onClick={applyCategoryToSelected}
-                                    disabled={!globalCategory || selectedIndices.length === 0}
-                                    className="bg-zinc-800 text-white px-3 py-2 rounded border border-zinc-600 hover:bg-zinc-700 disabled:opacity-50 text-xs font-bold uppercase"
-                                >
-                                    Aplicar
-                                </button>
                             </div>
 
                             <button
                                 onClick={handleSave}
-                                disabled={isSaving}
+                                disabled={isSaving || selectedIndices.length === 0}
                                 className="w-full md:w-auto bg-green-600 text-white px-6 py-2 rounded font-black uppercase hover:bg-green-500 shadow-lg shadow-green-900/20 flex items-center justify-center gap-2"
                             >
                                 {isSaving ? <Loader2 className="animate-spin" size={16} /> : <Save size={16} />}
-                                Salvar Itens Com Categoria
+                                Salvar Itens Selecionados
                             </button>
                         </div>
 
-                        {/* Table */}
                         <div className="bg-industrial-surface border border-zinc-800 rounded-lg overflow-hidden">
                             <table className="w-full text-left text-sm">
                                 <thead className="bg-black text-zinc-500 uppercase text-xs font-bold">
@@ -274,9 +231,7 @@ export function ImportPdf() {
                                         <th className="p-3 w-10">
                                             <input type="checkbox" checked={selectedIndices.length === parsedItems.length} onChange={toggleSelectAll} className="accent-industrial-yellow" />
                                         </th>
-                                        <th className="p-3">Produto (Detectado)</th>
-                                        <th className="p-3 text-center">Qtd</th>
-                                        <th className="p-3">Categoria</th>
+                                        <th className="p-3">Produto (Cadastro)</th>
                                         <th className="p-3 text-right">Ação</th>
                                     </tr>
                                 </thead>
@@ -297,16 +252,7 @@ export function ImportPdf() {
                                                 </div>
                                                 <div className="text-[10px] text-zinc-600 truncate max-w-[200px]">{item.originalLine}</div>
                                             </td>
-                                            <td className="p-3 text-center font-bold text-industrial-yellow">{item.quantity}</td>
-                                            <td className="p-3">
-                                                {item.suggestedCategory ? (
-                                                    <span className="bg-industrial-yellow text-black text-[10px] font-black uppercase px-2 py-0.5 rounded">
-                                                        {item.suggestedCategory}
-                                                    </span>
-                                                ) : (
-                                                    <span className="text-zinc-600 text-xs italic">--</span>
-                                                )}
-                                            </td>
+
                                             <td className="p-3 text-right">
                                                 <button
                                                     onClick={() => removeItem(idx)}
