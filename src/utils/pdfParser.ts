@@ -67,17 +67,19 @@ function extractItemsFromText(text: string): ParsedItem[] {
     // Normalize text (join lines with space just in case, though usually input is already joined per page)
     const normalized = text.replace(/\s+/g, ' ');
 
+
     // Strategy: Match the TABULAR structure visible in screenshot.
     // Row Pattern:  [ID] [DESCRIPTION] [UNIT_COLUMN]
     // ID: Number
     // Unit Column: UN, KG, L, CX, PC, FD, M, G (Standalone)
 
     // Regex Captures:
-    // Group 1: ID (for debug/verification)
-    // Group 2: Raw Description (Everything between ID and Unit Column)
+    // Group 1: ID (Matches start of line or space-separated number)
+    // Non-Capturing Gap: [^a-zA-Z]* -> Skips prices, dates, e.g. "5.99 ... 02/02/2026"
+    // Group 2: Raw Description (Found after skipping non-letters)
     // Group 3: Unit Column (Type)
 
-    const rowRegex = /\b(\d+)\s+([a-zA-Z0-9].*?)\s+(KG|UN|L|CX|PC|FD|M|LITRO|GRAMAS|ML|UND)\b/gi;
+    const rowRegex = /\b(\d+)\s+[^a-zA-Z]*([a-zA-Z].*?)\s+(KG|UN|L|CX|PC|FD|M|LITRO|GRAMAS|ML|UND)\b/gi;
 
     let match;
     while ((match = rowRegex.exec(normalized)) !== null) {
