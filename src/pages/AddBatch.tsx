@@ -67,11 +67,24 @@ export function AddBatch() {
             batchService.getProductsBySection(secObj.id)
                 .then(products => {
                     setSuggestedProducts(products);
-                    setIsNewProductMode(products.length === 0);
-                    // setName(''); // User might have typed something before selecting section, don't clear?
-                    // actually clear is safer to avoid confusion unless we are migrating.
-                    // Let's clear ONLY if the name field is empty or user hasn't typed much
-                    if (name.length < 2) setName('');
+
+                    // Logic: If user selected a name (potentially from IMPORTADOS), we don't want to clear it.
+                    // We only clear name if it's empty or we are starting fresh.
+                    // Checking if name exists in the NEW section set is helpful but we want to allow migration.
+
+                    // If name is typed/selected, don't clear it.
+                    // If name is empty, reset mode.
+                    if (name.length < 2) {
+                        setIsNewProductMode(products.length === 0);
+                        setName('');
+                    } else {
+                        // User has a name (e.g. "Carne Moida" from Importados)
+                        // He changed section to "Açougue"
+                        // Keep the name.
+                        // Check if this product is already in this new section?
+                        // If yes, just select it. If no, it will trigger migration on save.
+                        setIsNewProductMode(false);
+                    }
                 })
                 .catch(console.error);
         } else {
@@ -79,9 +92,11 @@ export function AddBatch() {
             setSuggestedProducts([]);
             // Don't force new product mode immediately if we might find it globally, 
             // but for a new section, usually it's a new product.
-            setIsNewProductMode(true);
+            if (name.length < 2) {
+                setIsNewProductMode(true);
+            }
         }
-    }, [section, existingSections]);
+    }, [section, existingSections]); // removed name from dependency if it was there (it wasn't)
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
