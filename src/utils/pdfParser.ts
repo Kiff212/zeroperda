@@ -58,12 +58,6 @@ export async function parseInvoicePDF(file: File): Promise<ParsedItem[]> {
     }
 }
 
-// Heuristic Regex to find invoice items
-// Patterns vary wildy. We look for common patterns in Brazilian NFe / NFCe 
-// Example Line: "001 789100005010 LEITE INTEGRAL 1L    UN   10,0000   5,99   59,90"
-// Improved Regex to find invoice items based on user feedback
-// User Rule: Ignore chars before first letter. Stop after Unit.
-// Standard line: "1234 LEITE INT 1L X 10,00"
 // We want: Name="LEITE INT 1L", Unit="1L" (or infer unit from end of name).
 
 function extractItemsFromText(text: string): ParsedItem[] {
