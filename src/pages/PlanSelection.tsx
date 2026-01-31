@@ -1,36 +1,11 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { CheckCircle2, Zap, ShieldCheck, ArrowRight } from 'lucide-react';
+import { getPrice, getAnnualTotal } from '../config/pricing';
 
 export function PlanSelection() {
     const navigate = useNavigate();
     const [billingCycle, setBillingCycle] = useState<'monthly' | 'annual'>('annual');
-
-    // Pricing Logic
-    const PRICING = {
-        start: {
-            monthly: 79.90,
-            annualDiscount: 0.20, // 20%
-        },
-        pro: {
-            monthly: 179.90,
-            annualDiscount: 0.35, // 35%
-        }
-    };
-
-    const getPrice = (plan: 'start' | 'pro') => {
-        const base = PRICING[plan].monthly;
-        if (billingCycle === 'monthly') return base.toFixed(2).replace('.', ',');
-
-        const discounted = base * (1 - PRICING[plan].annualDiscount);
-        return discounted.toFixed(2).replace('.', ',');
-    };
-
-    const getAnnualTotal = (plan: 'start' | 'pro') => {
-        const base = PRICING[plan].monthly;
-        const total = (base * 12) * (1 - PRICING[plan].annualDiscount);
-        return total.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-    };
 
     return (
         <div className="min-h-screen bg-black text-white font-sans selection:bg-industrial-red selection:text-white p-6 pb-24">
@@ -84,7 +59,7 @@ export function PlanSelection() {
                     <span className="text-xs font-bold text-zinc-500 uppercase tracking-widest mb-6 block">Validação</span>
 
                     <div className="flex items-baseline gap-1 mb-2">
-                        <span className="text-4xl font-black text-white">R$ {getPrice('start')}</span>
+                        <span className="text-4xl font-black text-white">R$ {getPrice('start', billingCycle)}</span>
                         <span className="text-zinc-500 font-bold">/mês</span>
                     </div>
 
@@ -143,7 +118,7 @@ export function PlanSelection() {
                     <span className="text-xs font-bold text-zinc-500 uppercase tracking-widest mb-6 block">Escala</span>
 
                     <div className="flex items-baseline gap-1 mb-2">
-                        <span className="text-5xl md:text-6xl font-black text-white">R$ {getPrice('pro')}</span>
+                        <span className="text-5xl md:text-6xl font-black text-white">R$ {getPrice('pro', billingCycle)}</span>
                         <span className="text-zinc-400 font-bold">/mês</span>
                     </div>
 

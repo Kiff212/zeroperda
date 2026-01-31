@@ -1,9 +1,10 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { LandingFooter } from '../components/landing/LandingFooter';
 import { ArrowRight, AlertTriangle, CheckCircle2, DollarSign, ShieldCheck, Database, Zap, Lock } from 'lucide-react';
+import { getPrice, getAnnualTotal } from '../config/pricing';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -12,6 +13,8 @@ export function LandingPage() {
     const heroRef = useRef<HTMLDivElement>(null);
     const painRef = useRef<HTMLDivElement>(null);
     const pricingRef = useRef<HTMLDivElement>(null);
+
+    const [billingCycle, setBillingCycle] = useState<'monthly' | 'annual'>('annual');
 
     useEffect(() => {
         const ctx = gsap.context(() => {
@@ -244,9 +247,40 @@ export function LandingPage() {
             {/* PRICING SECTION */}
             <section ref={pricingRef} className="py-24 px-6 bg-black">
                 <div className="max-w-6xl mx-auto">
-                    <h2 className="text-4xl font-black uppercase text-center mb-16 tracking-tighter">
+                    <h2 className="text-4xl font-black uppercase text-center mb-8 tracking-tighter">
                         Quanto custa a <span className="text-industrial-yellow">tranquilidade</span> da sua operação?
                     </h2>
+
+                    {/* Billing Slider */}
+                    <div className="flex justify-center mb-16">
+                        <div
+                            className="bg-zinc-900/80 p-1.5 rounded-full flex relative items-center cursor-pointer border border-zinc-800 shadow-2xl select-none"
+                            onClick={() => setBillingCycle(billingCycle === 'monthly' ? 'annual' : 'monthly')}
+                        >
+                            {/* Toggle Slider */}
+                            <div
+                                className="absolute h-[calc(100%-12px)] top-1.5 bg-industrial-yellow rounded-full transition-all duration-500 ease-[cubic-bezier(0.23,1,0.32,1)] shadow-lg"
+                                style={{
+                                    left: billingCycle === 'monthly' ? '6px' : '50%',
+                                    width: 'calc(50% - 6px)'
+                                }}
+                            />
+
+                            <button
+                                onClick={(e) => { e.stopPropagation(); setBillingCycle('monthly'); }}
+                                className={`px-8 py-3 rounded-full text-sm font-black uppercase tracking-widest transition-all relative z-10 w-40 ${billingCycle === 'monthly' ? 'text-black' : 'text-zinc-500 hover:text-white'}`}
+                            >
+                                Mensal
+                            </button>
+                            <button
+                                onClick={(e) => { e.stopPropagation(); setBillingCycle('annual'); }}
+                                className={`px-8 py-3 rounded-full text-sm font-black uppercase tracking-widest transition-all relative z-10 w-40 flex flex-col items-center leading-none gap-1 ${billingCycle === 'annual' ? 'text-black' : 'text-zinc-500 hover:text-white'}`}
+                            >
+                                <span>Anual</span>
+                                {billingCycle !== 'annual' && <span className="text-[9px] bg-green-500 text-black px-1.5 rounded font-bold absolute -top-2 -right-2 animate-bounce">Até -35%</span>}
+                            </button>
+                        </div>
+                    </div>
 
                     <div className="grid md:grid-cols-3 gap-8 items-stretch">
 
@@ -256,7 +290,7 @@ export function LandingPage() {
                             <span className="text-xs font-bold text-zinc-500 uppercase tracking-widest mb-6">Validação</span>
 
                             <div className="flex items-baseline gap-1 mb-2">
-                                <span className="text-4xl font-black text-white">R$ 79,90</span>
+                                <span className="text-4xl font-black text-white">R$ {getPrice('start', billingCycle)}</span>
                                 <span className="text-zinc-500 font-bold">/mês</span>
                             </div>
                             <p className="text-xs text-industrial-yellow font-bold uppercase mb-8">
@@ -295,7 +329,7 @@ export function LandingPage() {
                             <span className="text-xs font-bold text-zinc-500 uppercase tracking-widest mb-6">Escala</span>
 
                             <div className="flex items-baseline gap-1 mb-2">
-                                <span className="text-5xl font-black text-white">R$ 179,90</span>
+                                <span className="text-5xl font-black text-white">R$ {getPrice('pro', billingCycle)}</span>
                                 <span className="text-zinc-500 font-bold">/mês</span>
                             </div>
                             <p className="text-xs text-industrial-yellow font-bold uppercase mb-8">
