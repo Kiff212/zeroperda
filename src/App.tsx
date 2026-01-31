@@ -14,6 +14,7 @@ import { LandingPage } from './pages/LandingPage';
 import { OnboardingWizard } from './pages/OnboardingWizard';
 import { PlanSelection } from './pages/PlanSelection';
 import { RegisterPage } from './pages/RegisterPage';
+import { TeamSettings } from './pages/TeamSettings';
 
 import { batchService } from './services/batchService';
 import type { Batch } from './types/database.types';
@@ -336,6 +337,16 @@ function App() {
             <Route path="/import-pdf" element={
               <ProtectedRoute>
                 <ImportPdf />
+              </ProtectedRoute>
+            } />
+            <Route path="/import-pdf" element={
+              <ProtectedRoute>
+                <ImportPdf />
+              </ProtectedRoute>
+            } />
+            <Route path="/team" element={
+              <ProtectedRoute>
+                <TeamSettings />
               </ProtectedRoute>
             } />
             {/* Catch-all: Redirect to Landing */}

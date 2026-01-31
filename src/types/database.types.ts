@@ -5,12 +5,22 @@ export interface Organization {
     created_at?: string;
 }
 
+export interface Profile {
+    id: string;
+    full_name: string;
+    email: string;
+    created_at?: string;
+}
+
 export interface OrganizationMember {
     id: string; // uuid
     organization_id: string; // FK to organizations
     user_id: string; // FK to auth.users
     role?: 'owner' | 'member';
     created_at?: string;
+
+    // Joined fields
+    profiles?: Profile;
 }
 
 export interface Categoria {
