@@ -45,7 +45,7 @@ export function AffiliatePage() {
                             </p>
 
                             <button
-                                onClick={() => window.open('https://parceiros.zeroperda.com.br', '_blank')}
+                                onClick={() => window.open('https://dashboard.kiwify.com/join/affiliate/OCrRrfoK', '_blank')}
                                 className="bg-green-500 text-black text-xl font-black uppercase px-12 py-6 rounded-lg hover:bg-white transition-all shadow-[0_0_30px_rgba(34,197,94,0.3)] hover:shadow-[0_0_50px_rgba(34,197,94,0.6)] flex items-center justify-center gap-3 mx-auto group"
                             >
                                 Quero Ser Parceiro
@@ -171,7 +171,7 @@ export function AffiliatePage() {
 
                             <div className="mt-16 text-center">
                                 <button
-                                    onClick={() => window.open('https://parceiros.zeroperda.com.br', '_blank')}
+                                    onClick={() => window.open('https://dashboard.kiwify.com/join/affiliate/OCrRrfoK', '_blank')}
                                     className="bg-white text-black text-lg font-black uppercase px-12 py-5 rounded-lg hover:bg-zinc-200 transition-all flex items-center justify-center gap-3 mx-auto"
                                 >
                                     Solicitar Afiliação Agora
