@@ -4,7 +4,7 @@ import { AlertCircle, ArrowLeft, CheckCircle2, Loader2, Mail, ShieldQuestion } f
 import { supabase } from '../lib/supabase';
 
 export function ForgotPassword() {
-    const navigate = useNavigate();
+
     const [email, setEmail] = useState('');
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
