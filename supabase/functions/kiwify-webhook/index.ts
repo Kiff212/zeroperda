@@ -11,7 +11,6 @@ serve(async (req) => {
     try {
         // 1. Parse Payload
         const payload = await req.json()
-        console.log("Webhook received:", payload)
 
         // Kiwify sends 'order_status'
         // paid, refunded, chargedback
@@ -53,10 +52,7 @@ serve(async (req) => {
             amountPaid = Number(payload.commission);
         }
 
-        console.log("Amount Detected:", amountPaid);
-
         const targetPlan = amountPaid > 100 ? 'pro' : 'start';
-        console.log("Target Plan:", targetPlan);
 
         // 5. Init Supabase Admin (Service Role)
         const supabaseAdmin = createClient(
@@ -98,7 +94,6 @@ serve(async (req) => {
             .from('organizations')
             .update({
                 plan: targetPlan
-                // updated_at removed (column does not exist)
             })
             .eq('id', member.organization_id)
 

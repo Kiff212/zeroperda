@@ -13,7 +13,6 @@ export function ImportPdf() {
     const { currentOrg } = useOrganization();
 
     // State
-    // State
     const [file, setFile] = useState<File | null>(null);
     const [parsedItems, setParsedItems] = useState<ParsedItem[]>([]);
 

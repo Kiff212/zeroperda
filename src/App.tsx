@@ -14,6 +14,9 @@ import { LandingPage } from './pages/LandingPage';
 import { OnboardingWizard } from './pages/OnboardingWizard';
 import { PlanSelection } from './pages/PlanSelection';
 import { RegisterPage } from './pages/RegisterPage';
+import { JoinTeam } from './pages/JoinTeam';
+import { ForgotPassword } from './pages/ForgotPassword';
+import { UpdatePassword } from './pages/UpdatePassword';
 import { TeamSettings } from './pages/TeamSettings';
 
 import { batchService } from './services/batchService';
@@ -317,6 +320,9 @@ function App() {
             <Route path="/checkout" element={<PlanSelection />} />
             <Route path="/register" element={<RegisterPage />} />
             <Route path="/login" element={<Login />} />
+            <Route path="/join" element={<JoinTeam />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/update-password" element={<UpdatePassword />} />
 
             {/* Protected App Routes */}
             <Route path="/dashboard" element={

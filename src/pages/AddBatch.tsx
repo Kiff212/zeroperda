@@ -69,34 +69,27 @@ export function AddBatch() {
                     setSuggestedProducts(products);
 
                     // Logic: If user selected a name (potentially from IMPORTADOS), we don't want to clear it.
-                    // We only clear name if it's empty or we are starting fresh.
-                    // Checking if name exists in the NEW section set is helpful but we want to allow migration.
-
-                    // If name is typed/selected, don't clear it.
-                    // If name is empty, reset mode.
                     if (name.length < 2) {
+                        // Empty name? Show dropdown if products exist, else text input
                         setIsNewProductMode(products.length === 0);
                         setName('');
                     } else {
-                        // User has a name (e.g. "Carne Moida" from Importados)
-                        // He changed section to "Açougue"
-                        // Keep the name.
-                        // Check if this product is already in this new section?
-                        // If yes, just select it. If no, it will trigger migration on save.
-                        setIsNewProductMode(false);
+                        // User has a name (e.g. "SPATTEN")
+                        // He changed section to "GELADEIRA"
+                        // If "SPATTEN" is NOT in "GELADEIRA", switch to Text Mode to preserve it.
+                        // If it IS in "GELADEIRA", switch to Dropdown Mode.
+                        const existsInNewSection = products.some(p => p.nome.toUpperCase() === name.toUpperCase());
+                        setIsNewProductMode(!existsInNewSection);
                     }
                 })
                 .catch(console.error);
         } else {
             // New section (typed manually)
             setSuggestedProducts([]);
-            // Don't force new product mode immediately if we might find it globally, 
-            // but for a new section, usually it's a new product.
-            if (name.length < 2) {
-                setIsNewProductMode(true);
-            }
+            // Always text mode for new/unknown section
+            setIsNewProductMode(true);
         }
-    }, [section, existingSections]); // removed name from dependency if it was there (it wasn't)
+    }, [section, existingSections]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();

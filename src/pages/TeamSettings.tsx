@@ -6,7 +6,7 @@ import { teamService } from '../services/teamService';
 import type { OrganizationMember } from '../types/database.types';
 import { useOrganization } from '../contexts/OrganizationContext';
 import { useAuth } from '../contexts/AuthContext';
-import { ArrowLeft, Users, Plus, Trash2, Crown, Shield, Mail, Loader2, AlertCircle } from 'lucide-react';
+import { ArrowLeft, Users, Plus, Trash2, Crown, Shield, Mail, Loader2, AlertCircle, Copy } from 'lucide-react';
 import { getPlanLimit } from '../config/limits';
 
 export function TeamSettings() {
@@ -15,6 +15,7 @@ export function TeamSettings() {
     const { currentOrg } = useOrganization();
 
     const [members, setMembers] = useState<OrganizationMember[]>([]);
+    const [invites, setInvites] = useState<{ id: string, email: string }[]>([]); // New State
     const [loading, setLoading] = useState(true);
     const [inviteEmail, setInviteEmail] = useState('');
     const [adding, setAdding] = useState(false);
@@ -23,28 +24,47 @@ export function TeamSettings() {
 
     const plan = currentOrg?.plan || 'start';
     const limits = getPlanLimit(plan);
-    const usedSlots = members.length;
+    const usedSlots = members.length + invites.length; // Count invites too
     const canAdd = usedSlots < limits.users;
     const isOwner = members.find(m => m.user_id === user?.id)?.role === 'owner';
 
-    // Load Members
+    // Load Members & Invites
     useEffect(() => {
         if (currentOrg) {
-            loadMembers();
+            loadData();
         }
     }, [currentOrg]);
 
-    async function loadMembers() {
+    async function loadData() {
         if (!currentOrg) return;
         try {
             setLoading(true);
-            const data = await teamService.getMembers(currentOrg.id);
-            setMembers(data);
+            const [membersData, invitesData] = await Promise.all([
+                teamService.getMembers(currentOrg.id),
+                teamService.getInvites(currentOrg.id)
+            ]);
+            setMembers(membersData);
+            setInvites(invitesData);
         } catch (err) {
             console.error(err);
             setError("Erro ao carregar equipe.");
         } finally {
             setLoading(false);
+        }
+    }
+
+    // Wrapped for compatibility
+    const loadMembers = loadData;
+
+    // Cancel Invite
+    async function handleCancelInvite(inviteId: string) {
+        if (!confirm("Cancelar este convite?")) return;
+        try {
+            await teamService.cancelInvite(inviteId);
+            loadData();
+        } catch (err) {
+            console.error(err);
+            alert("Erro desconhecido.");
         }
     }
 
@@ -109,6 +129,53 @@ export function TeamSettings() {
                     </div>
                 ) : (
                     <>
+                        {/* PENDING INVITES */}
+                        {invites.length > 0 && (
+                            <section className="bg-zinc-900/30 border border-zinc-800/50 p-6 rounded-xl">
+                                <h3 className="text-sm font-black uppercase text-zinc-500 mb-4 block flex items-center gap-2">
+                                    <Mail size={16} /> Convites Pendentes
+                                </h3>
+
+                                <div className="space-y-2">
+                                    {invites.map(invite => (
+                                        <div key={invite.id} className="bg-zinc-900 border border-zinc-800 p-4 rounded-lg flex items-center justify-between border-dashed border-zinc-700">
+                                            <div>
+                                                <h4 className="text-zinc-300 font-bold text-sm">
+                                                    {invite.email}
+                                                </h4>
+                                                <span className="text-[10px] text-zinc-500 font-mono uppercase bg-zinc-800 px-2 py-0.5 rounded">
+                                                    Aguardando Cadastro
+                                                </span>
+                                            </div>
+
+                                            {isOwner && (
+                                                <div className="flex items-center gap-1">
+                                                    <button
+                                                        onClick={() => {
+                                                            const url = `${window.location.origin}/join?email=${invite.email}`;
+                                                            navigator.clipboard.writeText(url);
+                                                            alert("Link copiado: " + url);
+                                                        }}
+                                                        className="p-2 text-zinc-500 hover:text-industrial-yellow hover:bg-industrial-yellow/10 rounded transition-colors"
+                                                        title="Copiar Link de Convite"
+                                                    >
+                                                        <Copy size={16} />
+                                                    </button>
+                                                    <button
+                                                        onClick={() => handleCancelInvite(invite.id)}
+                                                        className="p-2 text-zinc-500 hover:text-red-500 hover:bg-red-500/10 rounded transition-colors"
+                                                        title="Cancelar convite"
+                                                    >
+                                                        <Trash2 size={16} />
+                                                    </button>
+                                                </div>
+                                            )}
+                                        </div>
+                                    ))}
+                                </div>
+                            </section>
+                        )}
+
                         {/* PLAN STATUS */}
                         <section className="bg-zinc-900 border-2 border-zinc-800 p-6 rounded-xl relative overflow-hidden">
                             <div className="flex justify-between items-start mb-4 relative z-10">
