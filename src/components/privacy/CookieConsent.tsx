@@ -53,7 +53,7 @@ export function CookieConsent() {
                         Aceitar & Continuar
                     </button>
                     <a
-                        href="/privacy" // Future privacy page
+                        href="/privacy"
                         className="flex-1 flex items-center justify-center text-zinc-500 font-bold uppercase text-xs hover:text-white transition-colors border border-zinc-800 rounded hover:border-zinc-600"
                     >
                         Ler Política

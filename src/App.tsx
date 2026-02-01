@@ -18,6 +18,9 @@ import { JoinTeam } from './pages/JoinTeam';
 import { ForgotPassword } from './pages/ForgotPassword';
 import { UpdatePassword } from './pages/UpdatePassword';
 import { TeamSettings } from './pages/TeamSettings';
+import { PrivacyPolicy } from './pages/PrivacyPolicy';
+import { TermsOfService } from './pages/TermsOfService';
+import { AffiliatePage } from './pages/AffiliatePage';
 
 import { batchService } from './services/batchService';
 import type { Batch } from './types/database.types';
@@ -323,6 +326,9 @@ function App() {
             <Route path="/join" element={<JoinTeam />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path="/update-password" element={<UpdatePassword />} />
+            <Route path="/privacy" element={<PrivacyPolicy />} />
+            <Route path="/terms" element={<TermsOfService />} />
+            <Route path="/parceiros" element={<AffiliatePage />} />
 
             {/* Protected App Routes */}
             <Route path="/dashboard" element={

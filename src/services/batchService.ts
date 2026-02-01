@@ -17,7 +17,8 @@ export const batchService = {
             .order('expiration_date', { ascending: true });
 
         if (error) {
-            console.error('Error fetching batches:', error);
+            // Only log in dev
+            if (import.meta.env.DEV) console.error('Error fetching batches:', error);
             throw error;
         }
         return data as Batch[];
@@ -119,7 +120,8 @@ export const batchService = {
             // and we are adding it to a specific section (e.g. AÇOUGUE),
             // we MOVE the product to the new section.
             if (existingProduct.categoria_id !== sectionId) {
-                console.log(`Migrating product ${productName} from cat ${existingProduct.categoria_id} to ${sectionId}`);
+                // Quiet migration in prod
+                if (import.meta.env.DEV) console.log(`Migrating product ${productName} from cat ${existingProduct.categoria_id} to ${sectionId}`);
                 await supabase
                     .from('produtos')
                     .update({ categoria_id: sectionId })

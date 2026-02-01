@@ -13,7 +13,10 @@ export function LandingFooter() {
                     </span>
                 </div>
 
-                <div className="flex gap-6">
+                <div className="flex gap-6 items-center">
+                    <a href="/parceiros" className="text-zinc-500 hover:text-green-500 text-xs font-bold uppercase transition-colors">
+                        Seja um Parceiro
+                    </a>
                     <div className="flex items-center gap-2 text-zinc-500 text-xs font-bold uppercase">
                         <ShieldCheck size={16} />
                         Dados Criptografados

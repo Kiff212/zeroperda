@@ -5,6 +5,7 @@ import { ArrowRight } from 'lucide-react';
 export function OnboardingWizard() {
     const navigate = useNavigate();
     const [step, setStep] = useState(0);
+    const [answers, setAnswers] = useState<string[]>([]);
 
     const questions = [
         {
@@ -29,11 +30,21 @@ export function OnboardingWizard() {
         }
     ];
 
-    const handleSelect = () => {
+    const handleSelect = (option: string) => {
+        const newAnswers = [...answers];
+        newAnswers[step] = option;
+        setAnswers(newAnswers);
+
         if (step < questions.length - 1) {
             setStep(step + 1);
         } else {
-            // Finished
+            // Finished - Save to local storage for Register Page
+            localStorage.setItem('zp_onboarding_data', JSON.stringify({
+                stock_size: questions[0].options.indexOf(answers[0] || questions[0].options[0]), // 0, 1, or 2
+                monthly_loss: questions[1].options.indexOf(answers[1] || questions[1].options[0]),
+                team_size: questions[2].options.indexOf(answers[2] || questions[2].options[0]),
+                commitment: true
+            }));
             navigate('/checkout');
         }
     };
@@ -70,7 +81,7 @@ export function OnboardingWizard() {
                     {questions[step]?.options.map((opt, idx) => (
                         <button
                             key={idx}
-                            onClick={handleSelect}
+                            onClick={() => handleSelect(opt)}
                             className="w-full text-left p-6 md:p-8 bg-zinc-900/50 border border-zinc-800 hover:border-industrial-red hover:bg-industrial-red/5 rounded-xl transition-all group flex items-center justify-between animate-in slide-in-from-bottom-8 duration-500 fade-in fill-mode-backwards"
                             style={{ animationDelay: `${idx * 100}ms` }}
                         >

@@ -51,7 +51,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             password,
             options: {
                 data: {
-                    role: 'admin', // default role
+                    role: 'member', // default role changed to member for security
                     ...meta
                 }
             }

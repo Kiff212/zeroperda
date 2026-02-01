@@ -25,9 +25,13 @@ export function RegisterPage() {
 
         try {
             // Pass plan metadata to Auth Context -> Supabase -> Post-Signup Trigger
+            const onboardingData = localStorage.getItem('zp_onboarding_data');
+            const meta = onboardingData ? JSON.parse(onboardingData) : {};
+
             await signUp(email, password, {
                 plan_tier: plan,
-                billing_cycle: cycle
+                billing_cycle: cycle,
+                ...meta
             });
             navigate('/dashboard'); // Direct access after success
         } catch (err: unknown) {
