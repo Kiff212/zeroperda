@@ -107,9 +107,9 @@ export function ImportPdf() {
             const remaining = parsedItems.filter(i => !i.suggestedCategory);
             setParsedItems(remaining);
 
-        } catch (err) {
+        } catch (err: any) {
             console.error(err);
-            setError("Erro ao salvar alguns itens. Verifique sua conexão.");
+            setError(err.message || "Erro ao salvar alguns itens. Verifique sua conexão.");
         } finally {
             setIsSaving(false);
         }

@@ -70,9 +70,9 @@ export function ImportPage() {
             setSuccess(true);
             setRawText('');
             setPreviewData([]);
-        } catch (err: unknown) {
+        } catch (err: any) {
             console.error(err);
-            setError("Erro ao importar. Verifique o console ou tente menos itens.");
+            setError(err.message || "Erro ao importar. Verifique o console ou tente menos itens.");
         } finally {
             setLoading(false);
         }

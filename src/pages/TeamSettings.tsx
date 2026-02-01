@@ -120,7 +120,7 @@ export function TeamSettings() {
                                 </div>
                                 {plan === 'start' && (
                                     <button
-                                        onClick={() => navigate('/intro')}
+                                        onClick={() => navigate('/checkout')}
                                         className="bg-industrial-yellow text-black text-xs font-bold uppercase px-3 py-1 rounded border border-black hover:bg-white transition-colors animate-pulse"
                                     >
                                         Fazer Upgrade

@@ -1,5 +1,6 @@
 import { supabase } from "../lib/supabase";
 import type { Batch, Categoria, Produto } from "../types/database.types";
+import { getPlanLimit } from "../config/limits";
 
 export const batchService = {
     // Get all active batches with product details AND section details
@@ -55,6 +56,23 @@ export const batchService = {
 
     async createBatch(organizationId: string, sectionName: string, productName: string, quantity: number, expirationDate: string): Promise<void> {
         if (!organizationId) throw new Error("Organization ID is required");
+
+        // 0. CHECK PLAN LIMITS
+        const { data: org } = await supabase.from('organizations').select('plan').eq('id', organizationId).single();
+        if (org) {
+            const limit = getPlanLimit(org.plan as any).items;
+            if (limit !== Infinity) {
+                const { count } = await supabase
+                    .from('batches')
+                    .select('*', { count: 'exact', head: true })
+                    .eq('organization_id', organizationId)
+                    .eq('status', 'active');
+
+                if ((count || 0) >= limit) {
+                    throw new Error(`Limite do plano atingido (${limit} itens). Faça upgrade para continuar.`);
+                }
+            }
+        }
 
         // 1. Resolve Target Section (Categoria)
         let sectionId: string;
@@ -207,6 +225,23 @@ export const batchService = {
     async addBatchToProduct(organizationId: string, productId: string, quantity: number, expirationDate: string): Promise<void> {
         if (!organizationId) throw new Error("Organization ID is required");
 
+        // 0. CHECK PLAN LIMITS
+        const { data: org } = await supabase.from('organizations').select('plan').eq('id', organizationId).single();
+        if (org) {
+            const limit = getPlanLimit(org.plan as any).items;
+            if (limit !== Infinity) {
+                const { count } = await supabase
+                    .from('batches')
+                    .select('*', { count: 'exact', head: true })
+                    .eq('organization_id', organizationId)
+                    .eq('status', 'active');
+
+                if ((count || 0) >= limit) {
+                    throw new Error(`Limite do plano atingido (${limit} itens). Faça upgrade para continuar.`);
+                }
+            }
+        }
+
         const { error } = await supabase
             .from('batches')
             .insert({
@@ -231,6 +266,24 @@ export const batchService = {
 
     async importProductsManual(organizationId: string, items: { section: string; product: string }[]): Promise<void> {
         if (!organizationId) throw new Error("Organization ID is required");
+
+        // 0. CHECK PLAN LIMITS (PRE-FLIGHT)
+        const { data: org } = await supabase.from('organizations').select('plan').eq('id', organizationId).single();
+        if (org) {
+            const limit = getPlanLimit(org.plan as any).items;
+            if (limit !== Infinity) {
+                const { count } = await supabase
+                    .from('batches')
+                    .select('*', { count: 'exact', head: true })
+                    .eq('organization_id', organizationId)
+                    .eq('status', 'active');
+
+                // If attempting to add items that would exceed limit
+                if ((count || 0) + items.length > limit) {
+                    throw new Error(`A importação excederia o limite do plano (${limit} itens). Faça upgrade.`);
+                }
+            }
+        }
 
         // NOTE: This manual implementation is fallback. Ideally use RPC if available.
         for (const item of items) {

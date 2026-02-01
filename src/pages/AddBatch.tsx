@@ -115,9 +115,9 @@ export function AddBatch() {
         try {
             await batchService.createBatch(currentOrg.id, section, name, parseInt(quantity), date);
             navigate('/dashboard');
-        } catch (err: unknown) {
+        } catch (err: any) {
             console.error(err);
-            setError("Erro ao salvar. Tente novamente.");
+            setError(err.message || "Erro ao salvar. Tente novamente.");
         } finally {
             setLoading(false);
         }
