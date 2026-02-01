@@ -2,10 +2,35 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { CheckCircle2, Zap, ShieldCheck, ArrowRight } from 'lucide-react';
 import { getPrice, getAnnualTotal } from '../config/pricing';
+import { useAuth } from '../contexts/AuthContext';
 
 export function PlanSelection() {
     const navigate = useNavigate();
     const [billingCycle, setBillingCycle] = useState<'monthly' | 'annual'>('annual');
+
+    const { session } = useAuth();
+
+    const handlePlanSelect = (plan: 'start' | 'pro') => {
+        // Kiwify Links provided by user
+        const KIWIFY_LINKS = {
+            start: "https://pay.kiwify.com.br/mF3AlNL",
+            pro: "https://pay.kiwify.com.br/To6pZ8r"
+        };
+
+        const link = KIWIFY_LINKS[plan];
+
+        if (session) {
+            // IF LOGGED IN: Go directly to payment (Avoid "Create Account" loop)
+            // Ideally passing email to Kiwify if they support it (e.g. ?email=...)
+            // For now, robust direct link.
+            window.open(link, '_blank');
+        } else {
+            // IF LOGGED OUT: Go to Register first (Standard Flow)
+            // Why? Because we need to create the account in Supabase first.
+            // Kiwify webhook will then find the user by email.
+            navigate('/register', { state: { plan, cycle: billingCycle } });
+        }
+    };
 
     return (
         <div className="min-h-screen bg-black text-white font-sans selection:bg-industrial-red selection:text-white p-6 pb-24">
@@ -92,7 +117,7 @@ export function PlanSelection() {
                     </ul>
 
                     <button
-                        onClick={() => navigate('/register', { state: { plan: 'start', cycle: billingCycle } })}
+                        onClick={() => handlePlanSelect('start')}
                         className="w-full py-4 bg-zinc-800 text-white font-bold uppercase rounded-lg hover:bg-zinc-700 transition-all border border-zinc-700 hover:border-zinc-500 flex items-center justify-center gap-2"
                     >
                         Selecionar Start
@@ -160,7 +185,7 @@ export function PlanSelection() {
                     </div>
 
                     <button
-                        onClick={() => navigate('/register', { state: { plan: 'pro', cycle: billingCycle } })}
+                        onClick={() => handlePlanSelect('pro')}
                         className="w-full py-5 bg-industrial-red text-white text-lg font-black uppercase rounded-lg hover:bg-red-600 transition-all shadow-lg btn-glow flex items-center justify-center gap-2 group"
                     >
                         Quero o Pro
