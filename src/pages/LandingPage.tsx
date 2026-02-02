@@ -277,7 +277,7 @@ export function LandingPage() {
                                 className={`px-8 py-3 rounded-full text-sm font-black uppercase tracking-widest transition-all relative z-10 w-40 flex flex-col items-center leading-none gap-1 ${billingCycle === 'annual' ? 'text-black' : 'text-zinc-500 hover:text-white'}`}
                             >
                                 <span>Anual</span>
-                                {billingCycle !== 'annual' && <span className="text-[9px] bg-green-500 text-black px-1.5 rounded font-bold absolute -top-2 -right-2 animate-bounce">Até -35%</span>}
+                                {billingCycle !== 'annual' && <span className="text-[9px] bg-green-500 text-black px-1.5 rounded font-bold absolute -top-2 -right-2 animate-bounce">Até -25%</span>}
                             </button>
                         </div>
                     </div>
@@ -310,7 +310,12 @@ export function LandingPage() {
                             </ul>
 
                             <button
-                                onClick={() => navigate('/intro')}
+                                onClick={() => {
+                                    const url = billingCycle === 'monthly'
+                                        ? 'https://pay.kiwify.com.br/aIpNoCI'
+                                        : 'https://pay.kiwify.com.br/ORh6A5v';
+                                    window.location.href = url;
+                                }}
                                 className="w-full py-4 bg-zinc-800 text-white font-bold uppercase rounded-lg hover:bg-zinc-700 transition-all border border-zinc-700 hover:border-white"
                             >
                                 Começar Agora
@@ -352,7 +357,12 @@ export function LandingPage() {
                             </ul>
 
                             <button
-                                onClick={() => navigate('/intro')}
+                                onClick={() => {
+                                    const url = billingCycle === 'monthly'
+                                        ? 'https://pay.kiwify.com.br/h9JaixL'
+                                        : 'https://pay.kiwify.com.br/6DQ3srd';
+                                    window.location.href = url;
+                                }}
                                 className="w-full py-5 bg-industrial-red text-white text-lg font-black uppercase rounded-lg hover:bg-red-600 transition-all shadow-lg btn-glow"
                             >
                                 Quero o Pro

@@ -1,11 +1,11 @@
 export const PRICING = {
     start: {
-        monthly: 79.90,
-        annualDiscount: 0.20, // 20%
+        monthly: 29.90,
+        annualDiscount: 0.10, // 10%
     },
     pro: {
-        monthly: 179.90,
-        annualDiscount: 0.35, // 35%
+        monthly: 79.90,
+        annualDiscount: 0.25, // 25%
     }
 };
 

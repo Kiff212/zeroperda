@@ -4,10 +4,12 @@ import { LandingFooter } from "../components/landing/LandingFooter";
 import { TrendingUp, Users, DollarSign, Wallet, ArrowRight, ShieldCheck } from "lucide-react";
 import { useState } from "react";
 
+import { PRICING } from "../config/pricing";
+
 export function AffiliatePage() {
     const [simulatedSales, setSimulatedSales] = useState(10);
     const COMMISSION_RATE = 0.30; // 30% commission assumption
-    const TICKET_PRICE = 97.00; // Average ticket (Start Plan)
+    const TICKET_PRICE = PRICING.pro.monthly; // Reference: Pro Plan
 
     // Monthly Recurring Revenue Simulation
     const monthlyIncome = (simulatedSales * TICKET_PRICE * COMMISSION_RATE).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
