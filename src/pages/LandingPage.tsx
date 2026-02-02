@@ -289,9 +289,10 @@ export function LandingPage() {
                             <h3 className="text-2xl font-black uppercase text-white mb-2">Plano Start</h3>
                             <span className="text-xs font-bold text-zinc-500 uppercase tracking-widest mb-6">Validação</span>
 
-                            <div className="flex items-baseline gap-1 mb-2">
+                            <div className="flex items-baseline gap-1 mb-2 flex-wrap">
                                 <span className="text-4xl font-black text-white">R$ {getPrice('start', billingCycle)}</span>
                                 <span className="text-zinc-500 font-bold">/mês</span>
+                                {billingCycle === 'annual' && <span className="text-xs text-zinc-500 font-medium ml-1">(cobrado anualmente)</span>}
                             </div>
                             <p className="text-xs text-industrial-yellow font-bold uppercase mb-8">
                                 O custo de 2 produtos vencidos paga o sistema.
@@ -333,9 +334,10 @@ export function LandingPage() {
                             </h3>
                             <span className="text-xs font-bold text-zinc-500 uppercase tracking-widest mb-6">Escala</span>
 
-                            <div className="flex items-baseline gap-1 mb-2">
+                            <div className="flex items-baseline gap-1 mb-2 flex-wrap">
                                 <span className="text-5xl font-black text-white">R$ {getPrice('pro', billingCycle)}</span>
                                 <span className="text-zinc-500 font-bold">/mês</span>
+                                {billingCycle === 'annual' && <span className="text-xs text-zinc-400 font-medium ml-1">(cobrado anualmente)</span>}
                             </div>
                             <p className="text-xs text-industrial-yellow font-bold uppercase mb-8">
                                 Blindagem completa contra falhas.

@@ -13,11 +13,17 @@ export function PlanSelection() {
     const handlePlanSelect = (plan: 'start' | 'pro') => {
         // Kiwify Links provided by user
         const KIWIFY_LINKS = {
-            start: "https://pay.kiwify.com.br/mF3AlNL",
-            pro: "https://pay.kiwify.com.br/To6pZ8r"
+            start: {
+                monthly: "https://pay.kiwify.com.br/aIpNoCI",
+                annual: "https://pay.kiwify.com.br/ORh6A5v"
+            },
+            pro: {
+                monthly: "https://pay.kiwify.com.br/h9JaixL",
+                annual: "https://pay.kiwify.com.br/6DQ3srd"
+            }
         };
 
-        const link = KIWIFY_LINKS[plan];
+        const link = KIWIFY_LINKS[plan][billingCycle];
 
         if (session) {
             // IF LOGGED IN: Go directly to payment (Avoid "Create Account" loop)
@@ -70,7 +76,7 @@ export function PlanSelection() {
                         className={`px-8 py-3 rounded-full text-sm font-black uppercase tracking-widest transition-all relative z-10 w-40 flex flex-col items-center leading-none gap-1 ${billingCycle === 'annual' ? 'text-black' : 'text-zinc-500 hover:text-white'}`}
                     >
                         <span>Anual</span>
-                        {billingCycle !== 'annual' && <span className="text-[9px] bg-green-500 text-black px-1.5 rounded font-bold absolute -top-2 -right-2 animate-bounce">Até -35%</span>}
+                        {billingCycle !== 'annual' && <span className="text-[9px] bg-green-500 text-black px-1.5 rounded font-bold absolute -top-2 -right-2 animate-bounce">Até -25%</span>}
                     </button>
                 </div>
             </div>
@@ -83,15 +89,16 @@ export function PlanSelection() {
                     <h3 className="text-2xl font-black uppercase text-white mb-2">Plano Start</h3>
                     <span className="text-xs font-bold text-zinc-500 uppercase tracking-widest mb-6 block">Validação</span>
 
-                    <div className="flex items-baseline gap-1 mb-2">
+                    <div className="flex items-baseline gap-1 mb-2 flex-wrap">
                         <span className="text-4xl font-black text-white">R$ {getPrice('start', billingCycle)}</span>
                         <span className="text-zinc-500 font-bold">/mês</span>
+                        {billingCycle === 'annual' && <span className="text-xs text-zinc-500 font-medium ml-1">(cobrado anualmente)</span>}
                     </div>
 
                     <div className="h-8 mb-4">
                         {billingCycle === 'annual' && (
                             <div className="flex items-center gap-2 animate-in fade-in slide-in-from-bottom-2 duration-300">
-                                <span className="text-xs text-green-500 font-bold uppercase bg-green-500/10 px-2 py-1 rounded">20% de Desconto</span>
+                                <span className="text-xs text-green-500 font-bold uppercase bg-green-500/10 px-2 py-1 rounded">10% de Desconto</span>
                                 <span className="text-xs text-zinc-500 font-mono">Total: {getAnnualTotal('start')}</span>
                             </div>
                         )}
@@ -142,15 +149,16 @@ export function PlanSelection() {
                     </h3>
                     <span className="text-xs font-bold text-zinc-500 uppercase tracking-widest mb-6 block">Escala</span>
 
-                    <div className="flex items-baseline gap-1 mb-2">
+                    <div className="flex items-baseline gap-1 mb-2 flex-wrap">
                         <span className="text-5xl md:text-6xl font-black text-white">R$ {getPrice('pro', billingCycle)}</span>
                         <span className="text-zinc-400 font-bold">/mês</span>
+                        {billingCycle === 'annual' && <span className="text-xs text-zinc-400 font-medium ml-1">(cobrado anualmente)</span>}
                     </div>
 
                     <div className="h-8 mb-4">
                         {billingCycle === 'annual' && (
                             <div className="flex items-center gap-2 animate-in fade-in slide-in-from-bottom-2 duration-300">
-                                <span className="text-xs text-industrial-yellow font-bold uppercase bg-industrial-yellow/10 px-2 py-1 rounded">35% de Desconto</span>
+                                <span className="text-xs text-industrial-yellow font-bold uppercase bg-industrial-yellow/10 px-2 py-1 rounded">25% de Desconto</span>
                                 <span className="text-xs text-zinc-500 font-mono">Total: {getAnnualTotal('pro')}</span>
                             </div>
                         )}
