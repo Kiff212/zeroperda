@@ -172,8 +172,10 @@ export function LandingPage() {
                 </div>
 
                 {/* TICKER (Footer of Hero) */}
+                {/* TICKER (Footer of Hero) */}
                 <div className="absolute bottom-0 left-0 w-full border-t border-zinc-900 bg-black/50 backdrop-blur-sm overflow-hidden py-3">
-                    <div className="flex whitespace-nowrap animate-marquee">
+                    {/* PC VERSION (Marquee) */}
+                    <div className="hidden md:flex whitespace-nowrap animate-marquee">
                         {[1, 2, 3].map((i) => (
                             <div key={i} className="flex items-center gap-12 px-6">
                                 <span className="flex items-center gap-2 text-xs font-bold font-mono text-zinc-400 uppercase">
@@ -186,16 +188,29 @@ export function LandingPage() {
                                     <span className="text-lg">🍞</span> Pão de Forma: <span className="text-industrial-red animate-pulse">CRÍTICO</span>
                                 </span>
                                 <span className="flex items-center gap-2 text-xs font-bold font-mono text-zinc-400 uppercase">
-                                    <span className="text-lg">🥫</span> Molho Tomate: <span className="text-blue-500">MONITORADO</span>
+                                    <span className="text-lg">🥫</span> Molho: <span className="text-blue-500">OK</span>
                                 </span>
                                 <span className="flex items-center gap-2 text-xs font-bold font-mono text-zinc-400 uppercase">
                                     <span className="text-lg">🥬</span> Alface: <span className="text-green-500">SALVO</span>
                                 </span>
                                 <span className="flex items-center gap-2 text-xs font-bold font-mono text-zinc-400 uppercase">
-                                    <span className="text-lg">🧀</span> Queijo Prato: <span className="text-yellow-500">ATENÇÃO</span>
+                                    <span className="text-lg">🧀</span> Queijo: <span className="text-yellow-500">ATENÇÃO</span>
                                 </span>
                             </div>
                         ))}
+                    </div>
+
+                    {/* MOBILE VERSION (Static Grid) */}
+                    <div className="flex md:hidden justify-between px-4 gap-2">
+                        <span className="flex items-center gap-1 text-[10px] font-bold font-mono text-zinc-400 uppercase">
+                            <span className="text-sm">🥛</span> Leite: <span className="text-green-500">SALVO</span>
+                        </span>
+                        <span className="flex items-center gap-1 text-[10px] font-bold font-mono text-zinc-400 uppercase">
+                            <span className="text-sm">🍞</span> Pão: <span className="text-industrial-red animate-pulse">CRÍTICO</span>
+                        </span>
+                        <span className="flex items-center gap-1 text-[10px] font-bold font-mono text-zinc-400 uppercase">
+                            <span className="text-sm">🥩</span> Carne: <span className="text-yellow-500">ATENÇÃO</span>
+                        </span>
                     </div>
                 </div>
             </header>
